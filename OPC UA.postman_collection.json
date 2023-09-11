@@ -1,0 +1,62 @@
+{
+	"info": {
+		"_postman_id": "86922e31-a48a-41fe-8c0e-16f17adb3da2",
+		"name": "OPC UA",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "ADD MAPPING",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Buildings\":[\r\n        {\r\n            \"BuildingName\": \"West Wing Building\",\r\n            \"Coordinates\":\"\",\r\n            \"Area\":\"\",\r\n            \"Address\":\"\",\r\n            \"Weather\":{\r\n                \"WeatherCondition\": \"\",\r\n                \"AtmosphoricPressure\": \"\",\r\n                \"Cloudage\":\"\",\r\n                \"DayTime\":\"\",\r\n                \"Precipitation\":\"\",\r\n                \"Visibility\":\"\"\r\n\r\n            },\r\n            \"Machines\":[\r\n                {\r\n                    \"Name\":\"Machine1\",\r\n                    \"Model\":\"\",\r\n                    \"Type\":\"\",\r\n                    \"Id\":\"\",\r\n                    \"Manufacturer\":\"\",\r\n                    \"Status\":\"\",\r\n                    \"BuildingName\":\"\",\r\n                    \"MeteringPoints\":[\r\n                        {\r\n                            \"MateringPointName\":\"Point1\",\r\n                            \"CommunicationProtocol\":\"\",\r\n                            \"SamplingRate\":\"\",\r\n                            \"EnergyObject\": {\r\n                                \"Thermal\": {\r\n                                    \"Voltage\":{\r\n                                                                \r\n                                    },\r\n                                    \"Current\":{\r\n\r\n                                    },\r\n                                    \"Power\": {\r\n                                        \"Mapping\": {\r\n                                            \"Type\": \"Variable\",\r\n                                            \"Table\": \"block_13\",    \r\n                                            \"TimeStamp\": \"tstp\",\r\n                                            \"Value\": \"energy\"\r\n                                        }\r\n                                    },\r\n                                    \"Lock\":\"\",\r\n                                    \"DailyConsumption\":{\r\n                                    \r\n                                    },\r\n                                    \"MonthlyConsumption\":{\r\n                                    }\r\n                                    \r\n                                },\r\n                                \"Gas\": {\r\n                                    \"Voltage\":{\r\n                                \r\n                                    },\r\n                                    \"Current\":{\r\n                                \r\n                                    },\r\n                                    \"Power\": {\r\n                                      \r\n                                    },\r\n                                    \"Lock\":\"\",\r\n                                    \"DailyConsumption\":{\r\n                                      \r\n                                    },\r\n                                    \"MonthlyConsumption\":{\r\n                                      \r\n                                    }\r\n                                    \r\n                                },\r\n                                \"Electric\": {\r\n                                    \"Voltage\":{\r\n                                       \r\n                                    },\r\n                                    \"Current\":{\r\n                                        \r\n                                    },\r\n                                    \"Power\": {\r\n                                       \r\n                                    },\r\n                                    \"Lock\":\"\",\r\n                                    \"DailyConsumption\":{\r\n                                        \r\n                                    },\r\n                                    \"MonthlyConsumption\":{\r\n                                        \r\n                                    }\r\n                                    \r\n                                }\r\n                            }\r\n                        }\r\n                    ]\r\n\r\n                },\r\n                {\r\n                    \"Name\":\"Machine2\",\r\n                    \"Model\":\"\",\r\n                    \"Type\":\"\",\r\n                    \"Id\":\"\",\r\n                    \"Manufacturer\":\"\",\r\n                    \"Status\":\"\",\r\n                    \"BuildingName\":\"\",\r\n                    \"MeteringPoints\":[\r\n                                {\r\n                                    \"MateringPointName\":\"Point1\",\r\n                                    \"CommunicationProtocol\":\"\",\r\n                                    \"SamplingRate\":\"\",\r\n                                    \"EnergyObject\": {\r\n                                        \"Thermal\": {\r\n                                            \"Voltage\":{\r\n                                              \r\n                                            },\r\n                                            \"Current\":{\r\n                                                \r\n                                            },\r\n                                            \"Power\": {\r\n                                                \r\n                                            },\r\n                                            \"Lock\":\"\",\r\n                                            \"DailyConsumption\":{\r\n                                               \r\n                                            },\r\n                                            \"MonthlyConsumption\":{\r\n                                                \r\n                                            }\r\n                                            \r\n                                        },\r\n                                        \"Gas\": {\r\n                                            \"Voltage\":{\r\n                                                \r\n                                            },\r\n                                            \"Current\":{\r\n                                               \r\n                                            },\r\n                                            \"Power\": {\r\n                                              \r\n                                            },\r\n                                            \"Lock\":\"\",\r\n                                            \"DailyConsumption\":{\r\n                                            },\r\n                                            \"MonthlyConsumption\":{\r\n\r\n                                            }\r\n                                            \r\n                                        },\r\n                                        \"Electric\": {\r\n                                            \"Voltage\":{\r\n\r\n                                            },\r\n                                            \"Current\":{\r\n\r\n                                            },\r\n                                            \"Power\": {\r\n\r\n                                            },\r\n                                            \"Lock\":\"\",\r\n                                            \"DailyConsumption\":{\r\n\r\n                                            },\r\n                                            \"MonthlyConsumption\":{\r\n\r\n                                            }\r\n                                            \r\n                                        }\r\n                                    }\r\n                                }\r\n                            ]\r\n                }\r\n                    \r\n\r\n                \r\n            ]\r\n        }\r\n    ] ,\r\n\r\n    \"Map\" : [ ]\r\n}\r\n\r\n\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/addMapping",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"addMapping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET MAPPING",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/getMapping",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"getMapping"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
