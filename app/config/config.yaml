@@ -1,0 +1,24 @@
+# Application Configuration
+
+database:
+  host: 127.0.0.1
+  port: 3306
+  dbname: energymeters
+  username: root
+  password: admin
+
+opc:
+  serverurl: opc.tcp://0.0.0.0:4840/freeopcua/server/
+  namespaceuri: http://example.org
+  namespace: OPCUA_SERVER
+  servername: InfoModel_Server
+  map: ./mapping/mapping.json
+
+api:
+  port: 5000
+  host: 127.0.0.1
+
+logging:
+  level: INFO
+  file: app.log
+

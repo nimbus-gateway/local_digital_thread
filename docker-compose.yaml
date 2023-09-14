@@ -1,0 +1,12 @@
+version: '3'
+services:
+  opc_server:
+    image: opc_server
+    ports:
+      - "4840:4840"
+    volumes:
+      - .:/app
+    network_mode: host 
+
+
+    

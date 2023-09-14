@@ -3,9 +3,14 @@ import mysql
 from mysql import connector
 from flask import jsonify
 
+
+import sys
+sys.path.append("..")
+
+
 from abc import ABC, abstractmethod
 class Connector:
-    def __init__(self, dbname):
+    def __init__(self, dbname, host, username, password):
         self.connection = None
         self.dbname = dbname
 
@@ -25,14 +30,12 @@ class Connector:
     def disconnect(self):
         pass
 
-
-
 class MySQLConnector(Connector):
-    def __init__(self, dbname):
+    def __init__(self, dbname, host, username, password):
         self.connection = mysql.connector.connect(
-                    host="127.0.0.1",
-                    user="root",
-                    password="admin",
+                    host=host,
+                    user=username,
+                    password=password,
                     database= dbname,
                     auth_plugin='mysql_native_password'
                 )

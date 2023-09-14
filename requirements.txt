@@ -1,0 +1,4 @@
+PyYAML==5.3.1
+opcua==0.98.13
+requests==2.31.0
+cryptography==2.8

@@ -37,3 +37,6 @@ ehthumbs.db
 Thumbs.db
 
 __pycache__/
+.app
+.git
+.vagrant

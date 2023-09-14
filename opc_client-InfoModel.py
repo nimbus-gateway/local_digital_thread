@@ -1,15 +1,22 @@
 from opcua import Client
-from rest.mapping.mapping import Mapping
-from rest.connectors.mysql_connector import MySQLConnector
+from app.mapping.mapping import Mapping
+from app.connectors.mysql_connector import MySQLConnector
 import os
+from app.config.config import Config
 
 
 client = Client("opc.tcp://localhost:4840/freeopcua/server/")
 
 cwd = os.path.abspath('./')
-mapping = Mapping(cwd + '/rest/mapping/mapping.json')
+mapping = Mapping(cwd + '/app/mapping/mapping.json')
 
-sql = MySQLConnector("energymeters")
+config_instance = Config("app/config/config.yaml")
+opc_config = config_instance.get_opc_config()
+db_config = config_instance.get_database_config()
+
+
+sql = MySQLConnector('energymeters', db_config['host'], db_config['username'], db_config['password'])
+
 
 
 
@@ -28,11 +35,6 @@ try:
     print("Desription of childrens are :", root.get_children_descriptions())
 
 
-    node = client.get_node("ns=2;i=79") 
-
-    value_to_write = 42
-
-    node.set_value(value_to_write)
 
 
     data_map = mapping.get_datamap()

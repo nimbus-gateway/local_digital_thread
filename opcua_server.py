@@ -1,24 +1,29 @@
 from opcua import Server, ua
-from opcua.common.xmlexporter import XmlExporter
-import mysql
-from mysql import connector
 from datetime import datetime
-import time
-from rest.mapping.mapping import Mapping
 import os
+from app.config.config import Config
+from coms import RestClient
+
+
+config_instance = Config("app/config/config.yaml")
+opc_config = config_instance.get_opc_config()
+api_config = config_instance.get_api_config()
+api = RestClient("http://{0}:{1}/".format(api_config['host'], api_config['port']))
+
+
 
 # Create a server instance
 server = Server()
 
 # Set server endpoint URL and port
-url = "opc.tcp://0.0.0.0:4840/freeopcua/server/"
+url = opc_config['serverurl']
 server.set_endpoint(url)
 
-server.set_server_name("InfoModel_Server")
+server.set_server_name(opc_config['servername'])
 
 # Setup server namespace
-uri = "http://example.org"
-idx = server.register_namespace("OPCUA_SERVER")
+uri = opc_config['namespaceuri']
+idx = server.register_namespace(opc_config['namespace'])
 
 # Create a new node for the namespace
 root = server.nodes.objects.add_folder(idx, "MyInfoModel")
@@ -105,7 +110,16 @@ energy_variables = ["Current", "Power", "Voltage"]
 
 
 cwd = os.path.abspath('./')
-mapping = Mapping(cwd + '/rest/mapping/mapping.json')
+
+response = api.get('getMapping')
+
+if response.status_code == 200:
+    mapping = response.json()
+    print("Response from API: ", mapping)
+else:
+    exit()
+
+# Mapping(cwd + '/rest/mapping/mapping.json')
 
 #function to add energy measurement types to the energy type object
 def add_energy_type_to_energy_folder(energy_type, folder, enery_objects):
@@ -119,20 +133,22 @@ def add_energy_type_to_energy_folder(energy_type, folder, enery_objects):
 
    
     if "Mapping" in enery_objects[energy_type]["Power"]:
-        mapping.register_nodeid(power_object.nodeid.Identifier, enery_objects[energy_type]["Power"]["Mapping"])
+        input = {'nodeid': power_object.nodeid.Identifier, 'mapping': enery_objects[energy_type]["Power"]["Mapping"]}
+        api.post('registerNode', input)
+        # mapping.register_nodeid(power_object.nodeid.Identifier, enery_objects[energy_type]["Power"]["Mapping"])
 
     elif "Mapping" in enery_objects[energy_type]["Voltage"]:
-        mapping.register_nodeid(voltage_object.nodeid.Identifier, enery_objects[energy_type]["Voltage"]["Mapping"])
+        input = {'nodeid': voltage_object.nodeid.Identifier, 'mapping': enery_objects[energy_type]["Voltage"]["Mapping"]}
+        api.post('registerNode', input)
+        # mapping.register_nodeid(voltage_object.nodeid.Identifier, enery_objects[energy_type]["Voltage"]["Mapping"])
 
     elif "Mapping" in enery_objects[energy_type]["Current"]:
-        mapping.register_nodeid(current_object.nodeid.Identifier, enery_objects[energy_type]["Current"]["Mapping"])
+        input = {'nodeid': current_object.nodeid.Identifier, 'mapping': enery_objects[energy_type]["Current"]["Mapping"]}
+        api.post('registerNode', input)
+        # mapping.register_nodeid(current_object.nodeid.Identifier, enery_objects[energy_type]["Current"]["Mapping"])
 
     
-
-    
-
-
-
+   
 
 #function to add metering points to the machine objects
 def add_metering_point_objects_to_machine_folder(metering_point, folder):
@@ -153,9 +169,7 @@ def add_machine_objects_to_building(machine_name, folder, metering_points):
 
 
 
-buildings = mapping.get_buildings()
-
-
+buildings = mapping['Buildings']
 
 
 
