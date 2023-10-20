@@ -17,4 +17,4 @@ EXPOSE 4840
 ENV NAME World
 
 # Run your application
-CMD ["python", "opcua_server.py"]
+CMD ["python", "server.py"]

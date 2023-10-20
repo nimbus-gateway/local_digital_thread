@@ -1,4 +1,8 @@
-from opcua import Client
+import asyncio
+import logging
+
+from asyncua import ua, Client
+
 from app.mapping.mapping import Mapping
 from app.connectors.mysql_connector import MySQLConnector
 import os
@@ -19,50 +23,55 @@ sql = MySQLConnector('energymeters', db_config['host'], db_config['username'], d
 
 
 
+async def main():
+    try:
+        await client.connect()
+
+        root = client.get_root_node()
+
+        print("Object node is ", root)
 
 
+        # print("Children of root are :", await root.get_children())
 
-try:
-    client.connect()
-
-    root = client.get_root_node()
-
-    print("Object node is ", root)
-
-
-    print("Children of root are :", root.get_children())
-
-    print("Desription of childrens are :", root.get_children_descriptions())
-
-
-
-
-    data_map = mapping.get_datamap()
-
-    for item in data_map:
-
-        nodeid = int(item["nodeid"])
-
-        node_object_id = "ns={0};i={1}".format(2, nodeid)
-
-        node_object = client.get_node(node_object_id)
-
-        timestamp_variable = node_object.get_child("2:TimeStamp")
-        value_variable = node_object.get_child("2:Value")
-
-        print(timestamp_variable.nodeid)
-
-        result = sql.get_latest_data(item["Table"], [item['TimeStamp'], item["Value"]])
-
-
-        timestamp_variable.set_value(result[0])
-
-        value_variable.set_value(result[1])
+        # print("Desription of childrens are :", await root.get_children_descriptions())
 
 
 
 
-    
+        data_map = mapping.get_datamap()
 
-finally:
-    client.disconnect()
+        for item in data_map:
+
+            nodeid = int(item["nodeid"])
+
+            node_object_id = "ns={0};i={1}".format(2, nodeid)
+
+            node_object = client.get_node(node_object_id)
+
+            print(node_object)
+            timestamp_variable = await node_object.get_child("2:TimeStamp")
+            value_variable = await node_object.get_child("2:Value")
+
+
+            # print(timestamp_variable.nodeid)
+
+            result = sql.get_latest_data(item["Table"], [item['TimeStamp'], item["Value"]])
+
+            print("Result from SQL :", result)
+            await timestamp_variable.set_value(result[0])
+
+            await value_variable.set_value(ua.DataValue(float(0.001)))
+
+
+
+
+        
+
+    finally:
+        await client.disconnect()
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    asyncio.run(main())

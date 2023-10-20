@@ -1,8 +1,10 @@
 from opcua import Server, ua
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 from app.config.config import Config
 from coms import RestClient
+
+from opcua.server.history_sql import HistorySQLite
 
 
 config_instance = Config("app/config/config.yaml")
@@ -24,6 +26,7 @@ server.set_server_name(opc_config['servername'])
 # Setup server namespace
 uri = opc_config['namespaceuri']
 idx = server.register_namespace(opc_config['namespace'])
+server.iserver.history_manager.set_storage(HistorySQLite("my_datavalue_history.sql"))
 
 # Create a new node for the namespace
 root = server.nodes.objects.add_folder(idx, "MyInfoModel")
@@ -45,13 +48,26 @@ common_TimeSeriesMeasurement_type = server.nodes.base_object_type.add_object_typ
 
 #define the object TimeSeries Measurement
 timestamp = common_TimeSeriesMeasurement_type.add_variable(idx, "TimeStamp", "XXXX", ua.VariantType.String)
-value = common_TimeSeriesMeasurement_type.add_variable(idx, "Value", 0.0, ua.VariantType.Float)
+value = common_TimeSeriesMeasurement_type.add_variable(idx, "Value", ua.Variant(0, ua.VariantType.Double))
+
+
 timestamp.set_writable()
 timestamp.set_modelling_rule(True) 
 value.set_writable()
 value.set_modelling_rule(True) 
 
 
+myobj = server.get_objects_node().add_object(idx, "MyObject")
+myvar = myobj.add_variable(idx, "MyVariable", ua.Variant(0, ua.VariantType.Double))
+myvar.set_writable()  # Set MyVariable to be writable by clients
+
+# Configure server to use sqlite as history database (default is a simple memory dict)
+
+
+ # enable data change history for this particular node, must be called after start since it uses subscription
+# server.historize_node_data_change(value,  period=datetime.timedelta(seconds=10), count=100)
+
+# server.historize_node_data_change(timestamp, period=datetime.timedelta(seconds=10), count=100)
 
 #define the object weather
 condition = common_Weather_type.add_variable(idx, "WeatherCondition", "", ua.VariantType.String).set_modelling_rule(True)
@@ -121,6 +137,8 @@ else:
 
 # Mapping(cwd + '/rest/mapping/mapping.json')
 
+
+
 #function to add energy measurement types to the energy type object
 def add_energy_type_to_energy_folder(energy_type, folder, enery_objects):
     energy_type_objects[energy_type] = folder.add_object(idx, f"{energy_type}", objecttype=common_ElectricEnergyMeasurement_type)
@@ -131,7 +149,17 @@ def add_energy_type_to_energy_folder(energy_type, folder, enery_objects):
     voltage_object = energy_type_objects[energy_type].add_object(idx, "Voltage", objecttype=common_TimeSeriesMeasurement_type)
     current_object = energy_type_objects[energy_type].add_object(idx, "Current", objecttype=common_TimeSeriesMeasurement_type)
 
-   
+    variable_nodes = power_object.get_children()
+
+    for variable in variable_nodes:
+        if(variable.get_browse_name()=="QualifiedName(2:Value)"):
+            server.historize_node_data_change(variable, period=None, count=100)
+
+    # value_variable_node = next(variable for variable in variable_nodes if variable.get_browse_name() == 'Value')
+
+    # print(value_variable_node)
+    
+
     if "Mapping" in enery_objects[energy_type]["Power"]:
         input = {'nodeid': power_object.nodeid.Identifier, 'mapping': enery_objects[energy_type]["Power"]["Mapping"]}
         api.post('registerNode', input)
@@ -194,6 +222,14 @@ for Building in buildings:
 
 
 server.start()
+
+print("historzining.....!!")
+
+
+# server.historize_node_data_change(temp, period=None, count=100)
+
+
+
 
 try:
     while True:

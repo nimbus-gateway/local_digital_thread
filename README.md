@@ -28,7 +28,7 @@ To interact with the REST API, you can import the OPC UA.postman_collection.json
 ### Step 4: Run the OPC UA Server in seperate terminal
 
 ```bash
-python opcua_server-InfoModel.py
+python server.py
 ```
 
 ### Step 5: OPC UA Client Data Insertion
