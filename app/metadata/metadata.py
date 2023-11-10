@@ -1,14 +1,14 @@
 import json
 import os
 
-class Mapping:
+class MetaData:
     def __init__(self, location):
 
         self.mapping = []
-
+        self.nodes = []
+        self.data_sources = {}
 
         self.location = location
-
 
         f = open(self.location)
         
@@ -17,6 +17,20 @@ class Mapping:
         loaded_dic = json.load(f)
 
         self.mapping  = loaded_dic
+
+    def register_datasource(self, key, source):
+        try:
+            print(str(key))
+            self.data_sources[str(key)] = source
+            return self.data_sources[str(key)] 
+        except Exception as e:
+            print("An error occurred:", str(e))
+            return False
+
+    def get_datasource(self, key):
+        print(key)
+        key_str = str(key)
+        return self.data_sources[key_str]
 
     def reload_mapping(self):
         f = open(self.location)
@@ -44,22 +58,23 @@ class Mapping:
     def register_nodeid(self, nodeid, mapping):
         mapping["nodeid"] = str(nodeid)
 
-        
+        mapping["MeasurementTimeStamp"]["nodeid"] = str(nodeid+2)
+        mapping["Measurementvalue"]["nodeid"] = str(nodeid+4)
         print("loging from mapping ", mapping["nodeid"])
         print("mapping ", mapping)
-        print(self.mapping["Map"])
 
-        self.mapping["Map"].append(mapping)
 
-        print(self.mapping["Map"])
-        try:
-            with open(self.location, 'w') as json_file:
-                json.dump(self.mapping, json_file)
+        self.nodes.append(mapping)
+        print(self.nodes)
+        return True
+        # try:
+        #     with open(self.location, 'w') as json_file:
+        #         json.dump(self.mapping, json_file)
           
-                return True
-        except Exception as e:
-            print("An error occurred:", str(e))
-            return False
+        #         return True
+        # except Exception as e:
+        #     print("An error occurred:", str(e))
+        #     return False
 
 
         
@@ -69,8 +84,12 @@ class Mapping:
     def get_mapping(self):
         return self.mapping
     
-    def get_datamap(self):
-        return self.mapping['Map']
+    # def get_datamap(self):
+    #     return self.mapping['Map']
+    
+    def get_nodes(self):
+        print(self.nodes)
+        return {"nodes": self.nodes}
 
 
 

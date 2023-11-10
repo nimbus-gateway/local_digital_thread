@@ -6,7 +6,7 @@ import time
 from math import sin
 import os
 from app.config.config import Config
-from coms import RestClient
+from comms.coms import RestClient
 
 
 from asyncua import ua, uamethod, Server
@@ -67,65 +67,30 @@ def turn_off(parent, inputs, outputs):
 
 
 
-#function to add energy measurement types to the energy type object
-# async def add_energy_type_to_energy_folder(idx, energy_type, folder, enery_objects,  objects_list):
-#     energy_type_objects[energy_type] = await folder.add_object(idx, f"{energy_type}", objecttype=objects_list['electric_measurement'])
 
-    
-#     power_object = await energy_type_objects[energy_type].add_object(idx, "Power", objecttype=objects_list['time_series_measurement'])
-#     voltage_object = await energy_type_objects[energy_type].add_object(idx, "Voltage", objecttype=objects_list['time_series_measurement'])
-#     current_object = await energy_type_objects[energy_type].add_object(idx, "Current", objecttype=objects_list['time_series_measurement'])
-
-#     print("Power Object......", power_object)
-
-#     # Updating the node IDs in the mapping
-#     if "Mapping" in enery_objects[energy_type]["Power"]:
-#         input = {'nodeid': power_object.nodeid.Identifier, 'mapping': enery_objects[energy_type]["Power"]["Mapping"]}
-#         api.post('registerNode', input)
-#         # mapping.register_nodeid(power_object.nodeid.Identifier, enery_objects[energy_type]["Power"]["Mapping"])
-
-#     elif "Mapping" in enery_objects[energy_type]["Voltage"]:
-#         input = {'nodeid': voltage_object.nodeid.Identifier, 'mapping': enery_objects[energy_type]["Voltage"]["Mapping"]}
-#         api.post('registerNode', input)
-#         # mapping.register_nodeid(voltage_object.nodeid.Identifier, enery_objects[energy_type]["Voltage"]["Mapping"])
-
-#     elif "Mapping" in enery_objects[energy_type]["Current"]:
-#         input = {'nodeid': current_object.nodeid.Identifier, 'mapping': enery_objects[energy_type]["Current"]["Mapping"]}
-#         api.post('registerNode', input)
-#         # mapping.register_nodeid(current_object.nodeid.Identifier, enery_objects[energy_type]["Current"]["Mapping"])
-
-    
-   
 
 #function to add metering points to the machine objects
-async def add_metering_point_objects_to_machine_folder(idx, metering_point, folder, objects_list):
-    metering_points_data_objects[metering_point['MateringPointName']] = await folder.add_object(idx, f"{metering_point['MateringPointName']}", objecttype=objects_list['device'])
-    meteringservice = await metering_points_data_objects[metering_point['MateringPointName']].add_object(idx, "MeteringService", objecttype = objects_list['service'])
+async def add_metering_point_objects_to_machine_folder(idx, meter, folder, objects_list):
+    metering_points_data_objects[meter['DeviceID']] = await folder.add_object(idx, f"{meter['DeviceID']}", objecttype=objects_list['device'])
+    meteringservice = await metering_points_data_objects[meter['DeviceID']].add_object(idx, "MeteringService", objecttype = objects_list['service'])
 
-    await meteringservice.add_object(idx, "CurrentMeasurement", objecttype = objects_list['measurement'])
+    current_measurement = await meteringservice.add_object(idx, "CurrentMeasurement", objecttype = objects_list['measurement'])
+
+    input = {'nodeid': current_measurement.nodeid.Identifier, 'mapping': meter['MeteringService']['CurrentMeasurement']}
+    api.post('addNode', input)
     await (await meteringservice.add_method(idx, "GetAverageDailyConsumption", dailyAverage, [], [], [])).set_modelling_rule(True)
     await (await meteringservice.add_method(idx, "GetAverageMonthlyConsumption", monthlyAverage, [], [], [])).set_modelling_rule(True)
     
     
 
 #function to add machines to the machine folder
-async def add_machine_objects_to_building(idx, machine_name, folder, metering_points, objects_list):
+async def add_machine_objects_to_building(idx, machine_name, folder, energy_meters, objects_list):
   
     machine_data_objects[machine_name] = await folder.add_object(idx, f"{machine_name}", objecttype=objects_list['device'])
     service = await machine_data_objects[machine_name].add_object(idx, "ServiceOffered", objecttype = objects_list['service'])
     MP_folder = await machine_data_objects[machine_name].add_folder(idx, "Energy Meters")
-    for metering_point in metering_points:
-        await add_metering_point_objects_to_machine_folder(idx, metering_point, MP_folder, objects_list)
-
-
-#function to add machines to the machine folder
-# def add_machine_objects_to_building(machine_name, folder):
-#     machine_data_objects[machine_name] = folder.add_object(idx, f"{machine_name}", objecttype=common_Device_type)
-#     service = machine_data_objects[machine_name].add_object(idx, "ServiceOffered", objecttype = common_Service_type)
-#     MP_folder = machine_data_objects[machine_name].add_folder(idx, "MeteringPoints")
-#     for metering_point in metering_points:
-#         add_metering_point_objects_to_machine_folder(metering_point, MP_folder)
-
+    for meters in energy_meters:
+        await add_metering_point_objects_to_machine_folder(idx, meters, MP_folder, objects_list)
 
 
 
@@ -148,11 +113,12 @@ async def main():
         ]
     )
 
+   
      # setup our own namespace
     uri = "http://examples.freeopcua.github.io"
     idx = await server.register_namespace(uri)
 
-    root = await server.nodes.objects.add_folder(idx, "MyInfoModel")
+    root = await server.nodes.objects.add_folder(idx, "Local Digital Thread")
 
 
     #define the object types
@@ -187,12 +153,26 @@ async def main():
     await (await common_Device_type.add_method(idx, "TurnOn", turn_on, [], [], [])).set_modelling_rule(True)
     await (await common_Device_type.add_method(idx, "TurnOff", turn_off, [], [], [])).set_modelling_rule(True)
 
+    # current_datetime = datetime.now()
+    ua_datetime = ua.win_epoch_to_datetime(int(time.time()))
 
     #define the object measurement
-    timeStamp_variable = await (await common_Measurement_type.add_variable(idx, "MeasurementTimeStamp", "", ua.VariantType.DateTime)).set_modelling_rule(True)
-    value_variable = await (await common_Measurement_type.add_variable(idx, "MeasurementValue", "", ua.VariantType.Double)).set_modelling_rule(True)
-    timeInterval_variable = await (await common_Measurement_type.add_variable(idx, "MeasurementTimeInterval", "", ua.VariantType.DateTime)).set_modelling_rule(True)
-    unit_variable = await (await common_Measurement_type.add_variable(idx, "MeasurementUnit", "", ua.VariantType.String)).set_modelling_rule(True)
+    timeStamp_variable = await common_Measurement_type.add_variable(idx, "MeasurementTimeStamp", ua_datetime, ua.VariantType.DateTime)
+    value_variable = await common_Measurement_type.add_variable(idx, "MeasurementValue", 0, ua.VariantType.Double)
+    timeInterval_variable = await common_Measurement_type.add_variable(idx, "MeasurementTimeInterval", "", ua.VariantType.DateTime)
+    unit_variable = await common_Measurement_type.add_variable(idx, "MeasurementUnit", "", ua.VariantType.String)
+
+    await timeStamp_variable.set_modelling_rule(True)
+    await value_variable.set_modelling_rule(True)
+    await timeInterval_variable.set_modelling_rule(True)
+    await unit_variable.set_modelling_rule(True)
+
+    await timeStamp_variable.set_writable(True)
+    await value_variable.set_writable(True)
+    await timeInterval_variable.set_writable(True)
+    await unit_variable.set_writable(True)
+
+    
 
     #define the object service type
     service_name_variable = await (await common_Service_type.add_property(idx, "ServiceName", "", ua.VariantType.String)).set_modelling_rule(True)
@@ -213,7 +193,7 @@ async def main():
     # calling the API and getting the mapping
     cwd = os.path.abspath('./')
 
-    response = api.get('getMapping')
+    response = api.get('mapping')
 
     if response.status_code == 200:
         mapping = response.json()
@@ -237,7 +217,7 @@ async def main():
         for machine in Building['Machines']:
             print("Adding Machine!!!!!!!!!!!!!!!")
 
-            await add_machine_objects_to_building(idx, machine['Name'], machine_folder, machine['MeteringPoints'], objects_list)
+            await add_machine_objects_to_building(idx, machine['DeviceID'], machine_folder, machine['EnergyMeters'], objects_list)
 
     
 

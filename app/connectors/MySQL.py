@@ -2,17 +2,26 @@ import json
 import mysql
 from mysql import connector
 from flask import jsonify
-
+import logging
 
 import sys
 sys.path.append("..")
 
+_logger = logging.getLogger(__name__)
 
 from abc import ABC, abstractmethod
 class Connector:
-    def __init__(self, dbname, host, username, password):
+    def __init__(self,):
         self.connection = None
-        self.dbname = dbname
+        # self.dbname = dbname
+
+    @abstractmethod
+    def connect_(self, dbname, host, username, password):
+        pass
+
+    @abstractmethod
+    def get_data(self, mapping={}):
+        pass
 
     @abstractmethod
     def get_data(self, fields=[]):
@@ -30,16 +39,30 @@ class Connector:
     def disconnect(self):
         pass
 
-class MySQLConnector(Connector):
-    def __init__(self, dbname, host, username, password):
-        self.connection = mysql.connector.connect(
-                    host=host,
-                    user=username,
-                    password=password,
-                    database= dbname,
-                    auth_plugin='mysql_native_password'
-                )
-    
+class MySQL(Connector):
+    def __init__(self):
+        self.connection = None
+
+    def connect_(self, dbname, host, username, password):
+        try:
+            self.connection = mysql.connector.connect(
+                        host=host,
+                        user=username,
+                        password=password,
+                        database= dbname,
+                        auth_plugin='mysql_native_password'
+                    )
+            return True
+        except Exception as e:
+            _logger.error("Error Occured")
+            print(e)
+            return False
+        
+    def connect(self, mapping={}, connection_profile={}):
+
+        _logger.info("Arguments Recieved ")
+        return self.connect_(mapping['dbname'], connection_profile['host'], connection_profile['username'], connection_profile['password'])
+
     def disconnect(self):
         self.connection.disconnect()
 
@@ -77,6 +100,24 @@ class MySQLConnector(Connector):
             print(e)
             return False
         
+    def get_data(self, mapping={}):
+
+        table = mapping['table']
+        col_names = [mapping['column']]
+        cursor = self.connection.cursor(buffered=True)
+
+        cols = " ,".join(col_names)
+        query = "SELECT {0} FROM {1}".format(cols, table)
+
+        try:
+            cursor.execute(query)
+            data = cursor.fetchall()
+            return data
+
+            
+        except Exception as e:
+            print(e)
+            return False
        
     
     def post_data(self, fields=[]):

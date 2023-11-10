@@ -7,12 +7,16 @@ database:
   username: root
   password: admin
 
+influx:
+  username: admin
+  password: influxadmin
+
 opc:
   serverurl: opc.tcp://0.0.0.0:4840/freeopcua/server/
   namespaceuri: http://example.org
   namespace: OPCUA_SERVER
-  servername: InfoModel_Server
-  map: ./mapping/mapping.json
+  servername: CORDS_LDT_Server
+  map: ./metadata/mapping.json
 
 api:
   port: 5000
