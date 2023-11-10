@@ -76,12 +76,12 @@ unit_variable = common_Measurement_type.add_variable(idx, "MeasurementUnit", "",
 service_name_variable = common_Service_type.add_property(idx, "ServiceName", "", ua.VariantType.String).set_modelling_rule(True)
 
 #define the object weather
-condition = common_Weather_type.add_variable(idx, "WeatherCondition", "", ua.VariantType.String).set_modelling_rule(True)
-pressure = common_Weather_type.add_variable(idx, "AtmosphoricPressure", 0.0, ua.VariantType.Float).set_modelling_rule(True)
-cloudage = common_Weather_type.add_variable(idx, "Cloudage", 0.0, ua.VariantType.Float).set_modelling_rule(True)
+wind_speed = common_Weather_type.add_variable(idx, "WindSpeed", "", ua.VariantType.Float).set_modelling_rule(True)
+wind_direction = common_Weather_type.add_variable(idx, "WindDirection", ua.VariantType.Float).set_modelling_rule(True)
+cloud_cover = common_Weather_type.add_variable(idx, "CloudCoverIndex", ua.VariantType.Float).set_modelling_rule(True)
 daytime = common_Weather_type.add_variable(idx, "DayTime", datetime.utcnow()).set_modelling_rule(True)
-percipitation = common_Weather_type.add_variable(idx, "Precipitation", 0.0, ua.VariantType.Float).set_modelling_rule(True)
-visibility = common_Weather_type.add_variable(idx, "Visibility", 0.0, ua.VariantType.Float).set_modelling_rule(True)
+humidity = common_Weather_type.add_variable(idx, "Humidity", ua.VariantType.Float).set_modelling_rule(True)
+temperature = common_Weather_type.add_variable(idx, "Temperature", ua.VariantType.Float).set_modelling_rule(True)
 
 machines = ["Machine1", "Machine2", "Machine3"]
 metering_points = ["EnergyMeter1", "EnergyMeter2", "EnergyMeter3"]
