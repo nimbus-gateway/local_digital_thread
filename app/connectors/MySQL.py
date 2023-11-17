@@ -3,6 +3,7 @@ import mysql
 from mysql import connector
 from flask import jsonify
 import logging
+from datetime import datetime
 
 import sys
 sys.path.append("..")
@@ -58,10 +59,10 @@ class MySQL(Connector):
             print(e)
             return False
         
-    def connect(self, mapping={}, connection_profile={}):
+    def connect(self, transformation={}, connection_profile={}):
 
         _logger.info("Arguments Recieved ")
-        return self.connect_(mapping['dbname'], connection_profile['host'], connection_profile['username'], connection_profile['password'])
+        return self.connect_(transformation['dbname'], connection_profile['host'], connection_profile['username'], connection_profile['password'])
 
     def disconnect(self):
         self.connection.disconnect()
@@ -100,10 +101,13 @@ class MySQL(Connector):
             print(e)
             return False
         
-    def get_data(self, mapping={}):
+    def get_data(self, transformation={}):
+        time_format = "%Y-%m-%d %H:%M:%S.%f%z"
+        table = transformation['table']
+        col_names = []
+        for key_col in transformation['mapping']:
+            col_names.append(transformation['mapping'][key_col])
 
-        table = mapping['table']
-        col_names = [mapping['column']]
         cursor = self.connection.cursor(buffered=True)
 
         cols = " ,".join(col_names)
@@ -112,7 +116,24 @@ class MySQL(Connector):
         try:
             cursor.execute(query)
             data = cursor.fetchall()
-            return data
+            result = []
+
+            for dt in data:
+
+                date_string = dt[0]
+
+                if '.' in date_string:
+                    parts = date_string.split('.')
+                    date_string = parts[0] + '.' + parts[1][:6]
+
+                # Parse the string into a datetime object
+                datetime_obj = datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S.%f")
+
+                unix_timestamp = datetime_obj.timestamp()
+
+                result.append((unix_timestamp, dt[1]))
+
+            return result
 
             
         except Exception as e:

@@ -219,43 +219,6 @@ async def main():
 
             await add_machine_objects_to_building(idx, machine['DeviceID'], machine_folder, machine['EnergyMeters'], objects_list)
 
-    
-
-
-
-    # w = await root.add_object(idx, "Weather", objecttype=common_Weather_type)
-
-    # # create a new node type we can instantiate in our address space
-    # dev = await server.nodes.base_object_type.add_object_type(idx, "MyDevice")
-    # await (await dev.add_variable(idx, "sensor1", 1.0)).set_modelling_rule(True)
-    # await (await dev.add_property(idx, "device_id", "0340")).set_modelling_rule(True)
-    # ctrl = await dev.add_object(idx, "controller")
-    # await ctrl.set_modelling_rule(True)
-    # await (await ctrl.add_property(idx, "state", "Idle")).set_modelling_rule(True)
-
-    # # populating our address space
-
-    # # First a folder to organise our nodes
-    # myfolder = await server.nodes.objects.add_folder(idx, "myEmptyFolder")
-    # # instanciate one instance of our device
-    # mydevice = await server.nodes.objects.add_object(idx, "Device0001", dev)
-    # mydevice_var = await mydevice.get_child(
-    #     [f"{idx}:controller", f"{idx}:state"]
-    # )  # get proxy to our device state variable
-    # # create directly some objects and variables
-    # myobj = await server.nodes.objects.add_object(idx, "MyObject")
-    # myvar = await myobj.add_variable(idx, "MyVariable", 6.7)
-    # await myvar.set_writable()  # Set MyVariable to be writable by clients
-    # mystringvar = await myobj.add_variable(idx, "MyStringVariable", "Really nice string")
-    # await mystringvar.set_writable()  # Set MyVariable to be writable by clients
-    # mydtvar = await myobj.add_variable(idx, "MyDateTimeVar", datetime.utcnow())
-    # await mydtvar.set_writable()  # Set MyVariable to be writable by clients
-    # myarrayvar = await myobj.add_variable(idx, "myarrayvar", [6.7, 7.9])
-    # myuintvar = await myobj.add_variable(idx, "myuintvar", ua.UInt16(4))
-    # await myobj.add_variable(idx, "myStronglytTypedVariable", ua.Variant([], ua.VariantType.UInt32))
-    # await myarrayvar.set_writable(True)
-    # myprop = await myobj.add_property(idx, "myproperty", "I am a property")
-
 
     # starting!
     async with server:

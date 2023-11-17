@@ -6,6 +6,7 @@ import mysql
 from mysql import connector
 import json
 from connectors.MySQL import MySQL
+from connectors.InFlux import InFlux
 from metadata.metadata import MetaData
 from config.config import Config
 
@@ -25,8 +26,8 @@ metadata = MetaData(opc_config['map'])
 def register_ds():
     data = request.get_json()
 
-    print(data)
-    status = metadata.register_datasource("test", data)
+    print(data['id'])
+    status = metadata.register_datasource(data['id'], data)
 
     if status:
         return jsonify(status)
@@ -35,7 +36,7 @@ def register_ds():
     
 @app.route('/datasource/<string:source>', methods=['GET'])
 def get_ds(source):
-    data_source = metadata.get_datasource("test")
+    data_source = metadata.get_datasource(source)
 
     if data_source:
         return jsonify(data_source)
@@ -45,15 +46,20 @@ def get_ds(source):
 
 
 # End point to retreive schema
-@app.route('/schema/<string:source>/<string:dbname>', methods=['GET'])
-def get_schema(source, dbname):
+@app.route('/schema/<string:source>/<string:dbname>/<string:table>', methods=['GET'])
+def get_schema(source, dbname, table):
     #connect to the sql database
+    if 'mysql' in source: 
+        sql = MySQL()
+        sql.connect_(dbname, db_config['host'], db_config['username'], db_config['password'])
 
-    sql = MySQL()
-    sql.connect_(dbname, db_config['host'], db_config['username'], db_config['password'])
-
-    return sql.describe_db()
-   
+        return sql.describe_db()
+    
+    elif 'influx' in source:
+        influx = InFlux()
+        status = influx.connect_("mtu", "localhost", "8086", "6R9Hg8swLRMBSVn6swE6yqmXAhSdcHAZ_G73NjP6QhdQKUkYhZWEuRfP-WsDKg5A3aYSnpBzmcG4fkUEoxZeGQ==")
+    
+        return influx.describe_db(dbname, table)
 
 @app.route('/mapping', methods=['POST'])
 def add_mapping():

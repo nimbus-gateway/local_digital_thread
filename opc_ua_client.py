@@ -6,8 +6,13 @@ from app.connectors.MySQL import MySQL
 from app.config.config import Config
 from comms.coms import RestClient
 import importlib
+import traceback
+from datetime import datetime, timedelta
+
 
 from asyncua import Client, ua
+
+
 
 # LOCAL DIGITAL THREAD VARIABLES
 config_instance = Config("app/config/config.yaml")
@@ -35,6 +40,26 @@ class SubHandler(object):
     def event_notification(self, event):
         print("New event", event)
 
+def unix_timestamp_to_ua_datetime(unix_timestamp):
+    """
+    Converts a Unix timestamp to an OPC UA DateTime object.
+    
+    Args:
+    unix_timestamp (float): The Unix timestamp to convert.
+
+    Returns:
+    ua.DateTime: The corresponding OPC UA DateTime object.
+    """
+    # Convert Unix timestamp (seconds since 1970-01-01) to OPC UA DateTime format
+    # OPC UA DateTime starts from 1601-01-01
+    unix_epoch = datetime(1970, 1, 1)
+    ua_epoch = datetime(1601, 1, 1)
+    delta_to_unix_epoch = unix_epoch - ua_epoch
+    total_seconds = delta_to_unix_epoch.total_seconds() + unix_timestamp
+    # OPC UA DateTime is in 100-nanosecond intervals
+    opcua_intervals = int(total_seconds * 10**7)
+
+    return ua.DateTime(opcua_intervals)
 
 async def main():
     url = "opc.tcp://localhost:4840/freeopcua/server/"
@@ -62,69 +87,80 @@ async def main():
 
         #iterating through OPC UA nodes
         for node in nodes:
-            measurementtimestamp = node['MeasurementTimeStamp']
-            measurementvalue = node['Measurementvalue']
-            
-            data_points = [measurementtimestamp, measurementvalue]
+            measurementtimestamp_nid= node['MeasurementTimeStamp']['nodeid']
+            measurementvalue_nid = node['Measurementvalue']['nodeid']
+            transformation = node["Transformation"]
+
             nodeid = node['nodeid']
 
             print(nodeid)
 
             actual_data_points = {}
 
-            for data in data_points:
-                connector_id = data['connector']
-                _logger.info("Getting info on data source:  %r", connector_id)
-                response = dt_api.get('datasource/'+ connector_id)
 
-                if response.status_code == 200:
-                    con = response.json()
+            connector_id = transformation['connector']
 
-                    try:
-                        module_name = "app.connectors.{0}".format(con['connector'])
-                        print(module_name)
-                        module = importlib.import_module(module_name)
+            _logger.info("Getting info on data source:  %r", connector_id)
+            response = dt_api.get('datasource/'+ connector_id)
 
-                        Connector = getattr(module, con['connector'])
+            print(response.json())
+
+            if response.status_code == 200:
+                con = response.json()
+
+                try:
+                    module_name = "app.connectors.{0}".format(con['connector'])
+                    print(module_name)
+                    module = importlib.import_module(module_name)
+
+                    Connector = getattr(module, con['connector'])
+                    
+                    connector = Connector()
+
+                    print(transformation)
+                    # print(connector)
+                    status = connector.connect(transformation, con['connection_profile'])
+                    
+                    if status:
+                        _logger.info("Connection initialized using")
+
+                        resp = connector.get_data(transformation=transformation)
                         
-                        connector = Connector()
+                        if resp:
+                            _logger.info("Raw data received")
 
-                        print(data['mapping'])
-                        # print(connector)
-                        status = connector.connect(data['mapping'], con['connection_profile'])
-                        
-                        if status:
-                            _logger.info("Connection initialized using")
+                            opc_value_variable = client.get_node(ua.NodeId(int(measurementvalue_nid), 2))
+                            opc_time_variable = client.get_node(ua.NodeId(int(measurementtimestamp_nid), 2))
+                            _logger.info("opc_value_nodeid is: %r", measurementvalue_nid)
+                            _logger.info("opc_timestamp_nodeid is: %r", measurementtimestamp_nid)
+                            _logger.info("opc_value_variable is: %r", opc_value_variable)
+                            _logger.info("opc_time_variable is: %r", opc_time_variable)
 
-                            resp = connector.get_data(mapping=data['mapping'])
-                            
-                            if resp:
-                                _logger.info("Raw data received")
+                            for val in resp:
+                                print(val[1])
+                                await opc_value_variable.write_value(float(val[1]))
 
-                                print(resp[0][0])
-                               
-                                for val in resp:
-                                    opc_variable = client.get_node(ua.NodeId(int(data['nodeid']), 2))
-                                    # obj = await client.nodes.root.get_child(["0:Objects", "2:West Wing Building"])
-                                    _logger.info("myvar is: %r", opc_variable)
-                                    
-                                    await opc_variable.write_value(float(resp[0][0]))
 
-                                    val = await opc_variable.read_value()
-                                    # print(val)
-                            
-                        else:
-                            _logger.error("Connection Failed")
+                                await opc_time_variable.write_value(datetime.utcfromtimestamp(val[0]))
+
+                                val = await opc_value_variable.read_value()
+                                date = await opc_time_variable.read_value()
+
+                    else:
+                        _logger.error("Connection Failed")
 
 
 
-                    except Exception as e:
-                        
-                        _logger.error("Error During Connection %r", e)
-                        exit()
-                else:
-                    _logger.error("Connector Not registered :  %r", connector_id)
-                    continue
+                except Exception as e:
+                    
+                    _logger.error("Error During Connection %r", e)
+                    print(traceback.format_exc())
+                    exit()
+            else:
+                _logger.error("Connector Not registered :  %r", connector_id)
+                continue
+
+            
         # result = sql.get_latest_data(item["Table"], [item['TimeStamp'], item["Value"]])
 
         # print("Result from SQL :", result)

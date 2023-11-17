@@ -57,9 +57,10 @@ class MetaData:
         
     def register_nodeid(self, nodeid, mapping):
         mapping["nodeid"] = str(nodeid)
-
-        mapping["MeasurementTimeStamp"]["nodeid"] = str(nodeid+2)
-        mapping["Measurementvalue"]["nodeid"] = str(nodeid+4)
+        mapping["MeasurementTimeStamp"] = {}
+        mapping["Measurementvalue"] = {}
+        mapping["MeasurementTimeStamp"]["nodeid"] = str(nodeid+1)
+        mapping["Measurementvalue"]["nodeid"] = str(nodeid+2)
         print("loging from mapping ", mapping["nodeid"])
         print("mapping ", mapping)
 
