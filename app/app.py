@@ -53,7 +53,7 @@ def get_schema(source, dbname, table):
         sql = MySQL()
         sql.connect_(dbname, db_config['host'], db_config['username'], db_config['password'])
 
-        return sql.describe_db()
+        return sql.describe_db(table)
     
     elif 'influx' in source:
         influx = InFlux()
@@ -88,7 +88,8 @@ def get_nodes():
 def registerNode():
     data = request.get_json()
 
-    result = metadata.register_nodeid(data['nodeid'], data['mapping'])
+    print("payload: ", data)
+    result = metadata.register_nodeid(data['reference_id'], data['nodeid'], data['mapping'])
     metadata.reload_mapping()
 
     if result:

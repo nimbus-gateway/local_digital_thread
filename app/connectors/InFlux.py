@@ -102,8 +102,13 @@ class InFlux(Connector):
         time_format = "%Y-%m-%d %H:%M:%S.%f%z"
         query_api = self.connection.query_api()
 
+        # query = """from(bucket: "{0}")
+        # |> range(start: -5h)
+        # |> filter(fn: (r) => r["_field"] == "{1}")
+        # |> filter(fn: (r) => r._measurement == "{2}")""".format(bucket, fieled_name, measurement)
+
         query = """from(bucket: "{0}")
-        |> range(start: -5h)
+        |> range(start: 2012-11-29T19:20:16Z, stop: 2016-01-29T19:21:16Z)
         |> filter(fn: (r) => r["_field"] == "{1}")
         |> filter(fn: (r) => r._measurement == "{2}")""".format(bucket, fieled_name, measurement)
 
@@ -119,7 +124,6 @@ class InFlux(Connector):
 
                     result.append((unix_timestamp, record['_value']))
 
-            print(result)
             return result
 
             

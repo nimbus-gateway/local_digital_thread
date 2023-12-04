@@ -10,6 +10,7 @@ from comms.coms import RestClient
 
 
 from asyncua import ua, uamethod, Server
+from asyncua.common.xmlexporter import XmlExporter
 
 
 _logger = logging.getLogger(__name__)
@@ -76,7 +77,7 @@ async def add_metering_point_objects_to_machine_folder(idx, meter, folder, objec
 
     current_measurement = await meteringservice.add_object(idx, "CurrentMeasurement", objecttype = objects_list['measurement'])
 
-    input = {'nodeid': current_measurement.nodeid.Identifier, 'mapping': meter['MeteringService']['CurrentMeasurement']}
+    input = {'reference_id': meter['DeviceID'],'nodeid': current_measurement.nodeid.Identifier, 'mapping': meter['MeteringService']['CurrentMeasurement']}
     api.post('addNode', input)
     await (await meteringservice.add_method(idx, "GetAverageDailyConsumption", dailyAverage, [], [], [])).set_modelling_rule(True)
     await (await meteringservice.add_method(idx, "GetAverageMonthlyConsumption", monthlyAverage, [], [], [])).set_modelling_rule(True)
@@ -85,14 +86,33 @@ async def add_metering_point_objects_to_machine_folder(idx, meter, folder, objec
 
 #function to add machines to the machine folder
 async def add_machine_objects_to_building(idx, machine_name, folder, energy_meters, objects_list):
-  
-    machine_data_objects[machine_name] = await folder.add_object(idx, f"{machine_name}", objecttype=objects_list['device'])
+    machine = machine_data_objects[machine_name] = await folder.add_object(idx, f"{machine_name}", objecttype=objects_list['device'])
     service = await machine_data_objects[machine_name].add_object(idx, "ServiceOffered", objecttype = objects_list['service'])
     MP_folder = await machine_data_objects[machine_name].add_folder(idx, "Energy Meters")
     for meters in energy_meters:
         await add_metering_point_objects_to_machine_folder(idx, meters, MP_folder, objects_list)
 
+    return machine
 
+async def list_all_nodes(root):
+    """
+    List all nodes in the OPC UA server starting from the given root node.
+    """
+    nodes = []
+
+    async def browse_nodes(node):
+        nodes.append(node)
+        children = await node.get_children()
+        for child in children:
+            await browse_nodes(child)
+
+    await browse_nodes(root)
+    return nodes
+
+async def export_nodes_to_xml(server, node_list):
+    exporter = XmlExporter(server)
+    await exporter.build_etree(node_list)
+    await exporter.write_xml('ua-export.xml')
 
 
 async def main():
@@ -140,9 +160,9 @@ async def main():
 
 
     #define the object building
-    area_variable = await (await common_Building_type.add_property(idx, "BuildingArea", "", ua.VariantType.Float)).set_modelling_rule(True)
+    area_variable = await (await common_Building_type.add_property(idx, "BuildingArea", "", ua.VariantType.String)).set_modelling_rule(True)
     name_variable = await (await common_Building_type.add_property(idx, "BuildingName", "", ua.VariantType.String)).set_modelling_rule(True)
-    ID_variable = await (await common_Building_type.add_property(idx, "BuildingID", "", ua.VariantType.Float)).set_modelling_rule(True)
+    ID_variable = await (await common_Building_type.add_property(idx, "BuildingID", "", ua.VariantType.String)).set_modelling_rule(True)
 
 
     #define the object device
@@ -159,7 +179,7 @@ async def main():
     #define the object measurement
     timeStamp_variable = await common_Measurement_type.add_variable(idx, "MeasurementTimeStamp", ua_datetime, ua.VariantType.DateTime)
     value_variable = await common_Measurement_type.add_variable(idx, "MeasurementValue", 0, ua.VariantType.Double)
-    timeInterval_variable = await common_Measurement_type.add_variable(idx, "MeasurementTimeInterval", "", ua.VariantType.DateTime)
+    timeInterval_variable = await common_Measurement_type.add_variable(idx, "MeasurementTimeInterval", "", ua.VariantType.String)
     unit_variable = await common_Measurement_type.add_variable(idx, "MeasurementUnit", "", ua.VariantType.String)
 
     await timeStamp_variable.set_modelling_rule(True)
@@ -179,11 +199,11 @@ async def main():
 
     #define the object weather
     condition = await (await common_Weather_type.add_variable(idx, "WeatherCondition", "", ua.VariantType.String)).set_modelling_rule(True)
-    pressure = await (await common_Weather_type.add_variable(idx, "AtmosphoricPressure", 0.0, ua.VariantType.Float)).set_modelling_rule(True)
-    cloudage = await (await common_Weather_type.add_variable(idx, "Cloudage", 0.0, ua.VariantType.Float)).set_modelling_rule(True)
+    pressure = await (await common_Weather_type.add_variable(idx, "AtmosphoricPressure", 0, ua.VariantType.Double)).set_modelling_rule(True)
+    cloudage = await (await common_Weather_type.add_variable(idx, "Cloudage", 0, ua.VariantType.Double)).set_modelling_rule(True)
     daytime = await (await common_Weather_type.add_variable(idx, "DayTime", datetime.utcnow())).set_modelling_rule(True)
-    percipitation = await (await common_Weather_type.add_variable(idx, "Precipitation", 0.0, ua.VariantType.Float)).set_modelling_rule(True)
-    visibility = await (await common_Weather_type.add_variable(idx, "Visibility", 0.0, ua.VariantType.Float)).set_modelling_rule(True)
+    percipitation = await (await common_Weather_type.add_variable(idx, "Precipitation", 0, ua.VariantType.Double)).set_modelling_rule(True)
+    visibility = await (await common_Weather_type.add_variable(idx, "Visibility", 0, ua.VariantType.Double)).set_modelling_rule(True)
 
 
    
@@ -209,36 +229,88 @@ async def main():
     for Building in buildings:
 
         building = await root.add_object(idx, Building['BuildingName'], objecttype=common_Building_type)
-        await building.add_object(idx, "BuidlingLocation", objecttype=common_Location_type)
-        await building.add_object(idx, "Weather", objecttype=common_Weather_type)
+
+        # setting building variable values
+        var = await building.get_child(["2:BuildingID"])
+        await var.set_value(Building['BuildingID'])
+        var = await building.get_child(["2:BuildingName"])
+        await var.set_value(Building['BuildingName'])
+        var = await building.get_child(["2:BuildingArea"])
+        await var.set_value(Building['BuildingArea'])
+
+
+        # set values for Building Location
+        location = await building.add_object(idx, "BuidlingLocation", objecttype=common_Location_type)
+        var = await location.get_child(["2:Latitude"])
+        await var.set_value(float(Building['BuildingLocation']['Latitude']))
+
+        var = await location.get_child(["2:Longitude"])
+        await var.set_value(float(Building['BuildingLocation']['Longitude']))
+
+
+         # set values for weather data
+        weather = await building.add_object(idx, "Weather", objecttype=common_Weather_type)
+        var = await weather.get_child(["2:AtmosphoricPressure"])
+        print(Building['Weather']['AtmosphoricPressure'])
+        await var.set_value(float(5.02))
+        var = await weather.get_child(["2:Cloudage"])
+        await var.set_value(float(Building['Weather']['Cloudage']))
+        var = await weather.get_child(["2:DayTime"])
+        await var.set_value(datetime.utcnow())
+        var = await weather.get_child(["2:Precipitation"])
+        await var.set_value(float(Building['Weather']['Precipitation']))
+        var = await weather.get_child(["2:Visibility"])
+        await var.set_value(float(Building['Weather']['Visibility']))
+        var = await weather.get_child(["2:WeatherCondition"])
+        await var.set_value(Building['Weather']['WeatherCondition'])
+
         machine_folder = await building.add_folder(idx, "Machines")
 
         print(Building)
         for machine in Building['Machines']:
             print("Adding Machine!!!!!!!!!!!!!!!")
 
-            await add_machine_objects_to_building(idx, machine['DeviceID'], machine_folder, machine['EnergyMeters'], objects_list)
+            machine_obj = await add_machine_objects_to_building(idx, machine['DeviceID'], machine_folder, machine['EnergyMeters'], objects_list)
+
+            # set values of machine object
+            var = await machine_obj.get_child(["2:DeviceID"])
+            await var.set_value(machine['DeviceID'])
+            var = await machine_obj.get_child(["2:DeviceManufacturer"])
+            await var.set_value(machine['DeviceManufacturer'])
+            var = await machine_obj.get_child(["2:DeviceModel"])
+            await var.set_value(machine['DeviceModel'])
+
+            for meter in machine['EnergyMeters']:
+                meter_obj = metering_points_data_objects[meter['DeviceID']]
+                var = await meter_obj.get_child(["2:DeviceID"])
+                await var.set_value(meter['DeviceID'])
+                var = await meter_obj.get_child(["2:DeviceManufacturer"])
+                await var.set_value(meter['DeviceManufacturer'])
+                var = await meter_obj.get_child(["2:DeviceModel"])
+                await var.set_value(meter['DeviceModel'])
+
+                metering_service_obj = await meter_obj.get_child(["2:MeteringService"])
+                current_measurement_obj = await metering_service_obj.get_child(["2:CurrentMeasurement"])
+                var = await current_measurement_obj.get_child(["2:MeasurementTimeInterval"])
+                await var.set_value(meter['MeteringService']['CurrentMeasurement']['MeasurementTimeInterval'])
+                var = await current_measurement_obj.get_child(["2:MeasurementUnit"])
+                await var.set_value(meter['MeteringService']['CurrentMeasurement']['MeasurementUnit'])
+
+
+    # exporter = XmlExporter(server)
+    # await exporter.build_etree(node_list, ['http://myua.org/test/'])
+
+    node_list = await list_all_nodes(server.get_root_node()) 
+    #[server.nodes.objects, server.nodes.types]
+    await export_nodes_to_xml(server, node_list)
+
+
+
 
 
     # starting!
     async with server:
         print("Available loggers are: ", logging.Logger.manager.loggerDict.keys())
-        # enable following if you want to subscribe to nodes on server side
-        # handler = SubHandler()
-        # sub = await server.create_subscription(500, handler)
-        # handle = await sub.subscribe_data_change(myvar)
-        # trigger event, all subscribed clients wil receive it
-        # var = await myarrayvar.read_value()  # return a ref to value in db server side! not a copy!
-        # var = copy.copy(
-        #     var
-        # )  # WARNING: we need to copy before writting again otherwise no data change event will be generated
-        # var.append(9.3)
-        #  await myarrayvar.write_value(var)
-        # await mydevice_var.write_value("Running")
-        # await myevgen.trigger(message="This is BaseEvent")
-        # write_attribute_value is a server side method which is faster than using write_value
-        # but than methods has less checks
-        # await server.write_attribute_value(myvar.nodeid, ua.DataValue(0.9))
 
         while True:
             await asyncio.sleep(0.1)

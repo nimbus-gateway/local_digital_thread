@@ -1,0 +1,7 @@
+sudo systemctl daemon-reload
+sudo systemctl start grafana-server
+sudo systemctl status grafana-server
+
+
+influxdb_user_name: admin
+influxdb_password: influxadmin

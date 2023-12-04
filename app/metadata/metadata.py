@@ -5,7 +5,7 @@ class MetaData:
     def __init__(self, location):
 
         self.mapping = []
-        self.nodes = []
+        self.nodes = {}
         self.data_sources = {}
 
         self.location = location
@@ -55,7 +55,7 @@ class MetaData:
             print("An error occurred:", str(e))
             return False
         
-    def register_nodeid(self, nodeid, mapping):
+    def register_nodeid(self, reference_id, nodeid, mapping):
         mapping["nodeid"] = str(nodeid)
         mapping["MeasurementTimeStamp"] = {}
         mapping["Measurementvalue"] = {}
@@ -65,7 +65,7 @@ class MetaData:
         print("mapping ", mapping)
 
 
-        self.nodes.append(mapping)
+        self.nodes[reference_id] = mapping
         print(self.nodes)
         return True
         # try:
@@ -90,7 +90,7 @@ class MetaData:
     
     def get_nodes(self):
         print(self.nodes)
-        return {"nodes": self.nodes}
+        return self.nodes
 
 
 

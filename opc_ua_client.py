@@ -8,6 +8,7 @@ from comms.coms import RestClient
 import importlib
 import traceback
 from datetime import datetime, timedelta
+import argparse
 
 
 from asyncua import Client, ua
@@ -23,6 +24,18 @@ dt_api = RestClient("http://{0}:{1}/".format(api_config['host'], api_config['por
 
 
 _logger = logging.getLogger(__name__)
+
+
+# Create the parser
+parser = argparse.ArgumentParser(description="OPC UA Data Ingestion Client Script for DBs.")
+
+
+# Add an argument
+parser.add_argument('--opcua_reference_id', type=str, help="this is ")
+parser.add_argument('--all', action='store_true', help="A boolean flag. If present, stores True, otherwise False.")
+
+# Parse the arguments
+args = parser.parse_args()
 
 # sql = MySQLConnector('energymeters', db_config['host'], db_config['username'], db_config['password'])
 
@@ -79,14 +92,23 @@ async def main():
         response = dt_api.get('nodes')
 
         if response.status_code == 200:
-            nodes = response.json()['nodes']
+            nodes = response.json()
             _logger.info("Response from API:  %r", nodes)
         else:
             _logger.error("Data Transformation API returins: %r", response.status_code)
             exit()
 
         #iterating through OPC UA nodes
-        for node in nodes:
+
+        if args.all:
+            nodes = nodes
+        else:
+
+            nodes = {args.opcua_reference_id: nodes[str(args.opcua_reference_id)]}
+            print(nodes)
+
+        for key in nodes:
+            node = nodes[key]
             measurementtimestamp_nid= node['MeasurementTimeStamp']['nodeid']
             measurementvalue_nid = node['Measurementvalue']['nodeid']
             transformation = node["Transformation"]
@@ -125,9 +147,13 @@ async def main():
                         _logger.info("Connection initialized using")
 
                         resp = connector.get_data(transformation=transformation)
+                        print("here.............,")
+                        print(resp)
                         
                         if resp:
                             _logger.info("Raw data received")
+
+                            
 
                             opc_value_variable = client.get_node(ua.NodeId(int(measurementvalue_nid), 2))
                             opc_time_variable = client.get_node(ua.NodeId(int(measurementtimestamp_nid), 2))
@@ -138,7 +164,11 @@ async def main():
 
                             for val in resp:
                                 print(val[1])
-                                await opc_value_variable.write_value(float(val[1]))
+
+                                data_value = ua.DataValue(ua.Variant(float(val[1]), ua.VariantType.Double), SourceTimestamp = datetime.utcfromtimestamp(val[0])) 
+
+                                # await opc_value_variable.write_value(float(val[1]))
+                                await opc_value_variable.write_value(data_value)
 
 
                                 await opc_time_variable.write_value(datetime.utcfromtimestamp(val[0]))

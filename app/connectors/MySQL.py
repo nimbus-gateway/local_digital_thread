@@ -69,7 +69,7 @@ class MySQL(Connector):
 
     def get_latest_data(self, table, col_names=[]):
         cursor = self.connection.cursor(buffered=True)
-
+        
         cols = " ,".join(col_names)
         query = "SELECT {0} FROM {1}".format(cols, table)
 
@@ -81,25 +81,27 @@ class MySQL(Connector):
             
 
         except Exception as e:
+            _logger.error("Error Occured:")
             print(e)
             return False
     
-    def get_data(self, table, col_names=[]):
-        cursor = self.connection.cursor(buffered=True)
+    # def get_data(self, table, col_names=[]):
+    #     cursor = self.connection.cursor(buffered=True)
+    #     print(col_names)
+    #     cols = " ,".join(col_names)
+    #     query = "SELECT {0} FROM {1}".format(cols, table)
 
-        cols = " ,".join(col_names)
-        query = "SELECT {0} FROM {1}".format(cols, table)
-
-        try:
-            cursor.execute(query)
-            data = cursor.fetchall()
-            return data
+    #     try:
+    #         cursor.execute(query)
+    #         data = cursor.fetchall()
+            
+    #         return data
 
             
 
-        except Exception as e:
-            print(e)
-            return False
+    #     except Exception as e:
+    #         print(e)
+    #         return False
         
     def get_data(self, transformation={}):
         time_format = "%Y-%m-%d %H:%M:%S.%f%z"
@@ -116,20 +118,21 @@ class MySQL(Connector):
         try:
             cursor.execute(query)
             data = cursor.fetchall()
+ 
             result = []
-
+            
             for dt in data:
 
-                date_string = dt[0]
-
-                if '.' in date_string:
-                    parts = date_string.split('.')
-                    date_string = parts[0] + '.' + parts[1][:6]
+                date = dt[0]
+                # print(date_string)
+                # if '.' in date_string:
+                #     parts = date_string.split('.')
+                #     date_string = parts[0] + '.' + parts[1][:6]
 
                 # Parse the string into a datetime object
-                datetime_obj = datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S.%f")
+                # datetime_obj = datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S.%f")
 
-                unix_timestamp = datetime_obj.timestamp()
+                unix_timestamp = date.timestamp()
 
                 result.append((unix_timestamp, dt[1]))
 
@@ -144,32 +147,19 @@ class MySQL(Connector):
     def post_data(self, fields=[]):
         return 1
     
-    def describe_db(self):
+    def describe_db(self, table_name):
         cursor = self.connection.cursor(buffered=True)
 
-        # Execute a query to retrieve table information
-        cursor.execute("SHOW TABLES")
-
-        # Fetch all the table names
-        tables = cursor.fetchall()
 
         response = []
-        # Print the list of tables
-        for table in tables:
-            table_name = table[0]
-            print(f"Table: {table_name}")
-            response.insert(0, {"table_name": table_name})
-
-            response[0]['cols'] = []
-
             # Get the columns for each table
-            cursor.execute(f"DESCRIBE {table_name}")
-            columns = cursor.fetchall()
-            for column in columns:
-                col = {"name": column[0], "type": str(column[1]), "null": str(column[2]), "key": str(column[3]), "default": str(column[4]) }
-                response[0]['cols'].append(col)
+        cursor.execute(f"DESCRIBE {table_name}")
+        columns = cursor.fetchall()
+        for column in columns:
+            col = {"name": column[0], "type": str(column[1]), "null": str(column[2]), "key": str(column[3]), "default": str(column[4]) }
+            response.append(col)
 
-                print(col)
+            print(col)
 
         # Close the cursor and connection
         cursor.close()
