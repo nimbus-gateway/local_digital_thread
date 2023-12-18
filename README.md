@@ -9,7 +9,7 @@ This repository contains instructions on how to initialize and run the current P
 The following Figure represents the architecture of the local digital thread:
 
 
-![Architecture]([local digital thread architecture.png](https://github.com/tharindupr/local_digital_thread/blob/main/local%20digital%20thread%20architecture.png?raw=true))
+![Architecture](https://github.com/tharindupr/local_digital_thread/blob/main/local%20digital%20thread%20architecture.png)
 
 ## Running the source code
 
