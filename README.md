@@ -4,6 +4,13 @@ Energy data within an organisation can often be distributed across different dat
 
 This repository contains instructions on how to initialize and run the current POC of the Local Digital Thread application.
 
+## Architecture 
+
+The following Figure represents the architecture of the local digital thread:
+
+
+![Architecture]([local digital thread architecture.png](https://github.com/tharindupr/local_digital_thread/blob/main/local%20digital%20thread%20architecture.png?raw=true))
+
 ## Running the source code
 
 ### Step 1: Database Setup
