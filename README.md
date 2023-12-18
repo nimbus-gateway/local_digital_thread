@@ -1,6 +1,6 @@
 # local_digital_thread
 
-Energy data within an organisation can often be distributed across different data endpoints with varied meta-data representation which hinders seamless data collection and access from a single point for visualization and analytics. Moreover, there can be security and privacy constraints at data endpoints preventing data sharing and management. Thus, a local digital thread is required to aggregate the data from distributed data sources of an organization to standardize the data collection, representation, and preparation for further processing. 
+Energy data within an organisation can often be distributed across different data endpoints with varied meta-data representation, which hinders seamless data collection and access from a single point for visualization and analytics. Moreover, there can be security and privacy constraints at data endpoints preventing data sharing and management. Thus, a local digital thread is required to aggregate the data from distributed data sources of an organization to standardize the data collection, representation, and preparation for further processing. 
 
 This repository contains instructions on how to initialize and run the current POC of the Local Digital Thread application.
 
@@ -13,35 +13,36 @@ The following Figure represents the architecture of the local digital thread:
 
 ## Running the source code
 
-### Step 1: Database Setup
-
-To get started, you'll need to create the necessary database and populate it with data using the provided SQL script. Follow these steps:
-
-- Locate the SQL script at `dbs/energymeters_block_13.sql`.
-- Run the script to create and populate the database.
-
-### Step 2: Running the REST API
+### Data Transformation API
 
 The application uses a REST API to interact with the data. Follow these commands to run the REST API:
 
 ```bash
 cd app
-python app.py
+flask run --host=0.0.0.0 --port=8080
 ```
 
-### Step 3: Interacting with the REST API
+To interact with the REST API, you can import the OPC UA.postman_collection.json collection into your Postman environment. This collection includes pre-configured requests for interacting with the API. The following are the steps:
 
-To interact with the REST API, you can import the OPC UA.postman_collection.json collection into your Postman environment. This collection includes pre-configured requests for interacting with the API.
+1. Register Local Data Source: POST /datasource
+2. Populate the Common Information Model(CIM): POST /mapping
+3. Restart the OPC UA server
 
 
-### Step 4: Run the OPC UA Server in seperate terminal
-
+### Running OPC UA Server
 ```bash
 python server.py
 ```
 
-### Step 5: OPC UA Client Data Insertion
+### Running Telegraf
+Telegraf is used to collect data pushed to the OPC UA server. The data that is being collected are pushed to an Influx DB instance for persistence. So make sure that a Influx DB instance is running and a bucket name "Local Digital Thread" exists in the DB.
 
+```bash
+cd telegraf
+telegraf --config telegraf.conf
+```
+
+### Client CLI for pushing data 
 To insert data into the OPC UA server, you can run the OPC UA client. Use the following command:
 
 ```bash
