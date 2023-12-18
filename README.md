@@ -1,6 +1,8 @@
 # local_digital_thread
 
-This repository contains instructions on how to initialize and run the Local Digital Thread application.
+Energy data within an organisation can often be distributed across different data endpoints with varied meta-data representation which hinders seamless data collection and access from a single point for visualization and analytics. Moreover, there can be security and privacy constraints at data endpoints preventing data sharing and management. Thus, a local digital thread is required to aggregate the data from distributed data sources of an organization to standardize the data collection, representation, and preparation for further processing. 
+
+This repository contains instructions on how to initialize and run the current POC of the Local Digital Thread application.
 
 ## Running the source code
 
