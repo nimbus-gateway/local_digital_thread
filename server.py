@@ -300,9 +300,9 @@ async def main():
     # exporter = XmlExporter(server)
     # await exporter.build_etree(node_list, ['http://myua.org/test/'])
 
-    node_list = await list_all_nodes(server.get_root_node()) 
-    #[server.nodes.objects, server.nodes.types]
-    await export_nodes_to_xml(server, node_list)
+    # node_list = await list_all_nodes(server.get_root_node()) 
+    # #[server.nodes.objects, server.nodes.types]
+    # await export_nodes_to_xml(server, node_list)
 
 
 
