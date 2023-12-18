@@ -46,7 +46,7 @@ telegraf --config telegraf.conf
 To insert data into the OPC UA server, you can run the OPC UA client. Use the following command:
 
 ```bash
-python opc_client-InfoModel.py
+python opc_client.py --opcua_reference_id="name_of_opc_ua_object"
 ```
 
 
