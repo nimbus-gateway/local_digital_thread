@@ -9,7 +9,7 @@ This repository contains instructions on how to initialize and run the current P
 The following Figure represents the architecture of the local digital thread:
 
 
-![Architecture](https://github.com/tharindupr/local_digital_thread/blob/main/local%20digital%20thread%20architecture.png)
+![Architecture](https://github.com/nimbus-gateway/local_digital_thread/blob/main/docs/local%20digital%20thread%20architecture.png?raw=true)
 
 ## Running the source code
 
@@ -30,6 +30,9 @@ To interact with the REST API, you can import the OPC UA.postman_collection.json
 
 
 ### Running OPC UA Server
+
+The OPC UA server implements the CORDS' local digital thread's [CIM](https://github.com/nimbus-gateway/local_digital_thread/blob/main/docs/cim.PNG?raw=true) as an OPC UA representation. The local database schemas can then be mapped to OPC UA object instances defined through the Data Transformation API. 
+
 ```bash
 python server.py
 ```
