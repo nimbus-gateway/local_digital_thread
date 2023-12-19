@@ -13,6 +13,12 @@ The following Figure represents the architecture of the local digital thread:
 
 ## Running the source code
 
+### Pre Requisites 
+1. Python 3.X
+2. Pip3
+3. MySQL/Influx DB
+4. Telegraf 1.29.1
+
 ### Data Transformation API
 
 The application uses a REST API to interact with the data. Follow these commands to run the REST API:
