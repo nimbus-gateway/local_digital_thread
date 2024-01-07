@@ -19,7 +19,7 @@ The application uses a REST API to interact with the data. Follow these commands
 
 ```bash
 cd app
-flask run --host=0.0.0.0 --port=8080
+flask run --host=0.0.0.0 --port=5000
 ```
 
 To interact with the REST API, you can import the OPC UA.postman_collection.json collection into your Postman environment. This collection includes pre-configured requests for interacting with the API. The following are the steps:
