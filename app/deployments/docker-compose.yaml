@@ -1,0 +1,21 @@
+version: '3'
+services:
+  data_source_manager:
+    image: data_source_manager  
+    ports:
+      - "5000:5000"
+    network_mode: host 
+    environment:
+      # MySQL Configuration
+      MYSQL_HOST: 127.0.0.1
+      MYSQL_PORT: 3306
+      MYSQL_DBNAME: energymeters
+      MYSQL_USERNAME: root
+      MYSQL_PASSWORD: admin
+
+      # InfluxDB Configuration
+      INFLUX_HOST: 127.0.0.1
+      INFLUX_PORT: 8086
+      INFLUX_ORG: mtu
+      INFLUX_TOKEN: JOC0TKLtbsC4_UJVl7ebtbtwmmaTG3HmN1SUASmz60PgVH9SA70ehzA4n01V9AlbC22W1UJ0tTDtd22Y-vFoPg==
+

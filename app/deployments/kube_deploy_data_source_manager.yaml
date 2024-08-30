@@ -1,0 +1,129 @@
+# apiVersion: v1
+# kind: Namespace
+# metadata:
+#   name: cords
+---
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: cords-config
+#   namespace: cords
+# data:
+#   DATA_SOURCE_MANAGER_HOST: 0.0.0.0
+#   DATA_SOURCE_MANAGER_PORT: '5002'
+#   # DATA_SOURCE_MANAGER_CONFIG: config.yaml
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cords-secret
+  namespace: cords
+type: Opaque
+data:
+  MYSQL_USERNAME: cm9vdA==
+  MYSQL_PASSWORD: YWRtaW4=
+  INFLUX_TOKEN: Sk9DMFRLTHRic0M0X1VKVmw3ZWJ0YnR3bW1hVEczSG1OMVNVQVNtejYwUGdWSDlTQTcwZWh6QTRuMDFWOUFsYkMyMlcxVUowdFREdGQyMlktdkZvUGc9PQ==
+---
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: cords-pv
+#   namespace: cords
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   capacity:
+#     storage: 20Mi
+#   hostPath:
+#     path: "/mnt/data/cords_config"
+#     type: DirectoryOrCreate
+#   persistentVolumeReclaimPolicy: Delete
+#   storageClassName: local-path
+#   volumeMode: Filesystem
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: cords-pvc
+#   namespace: cords
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 20Mi
+#   storageClassName: local-path
+#   volumeMode: Filesystem
+#   volumeName: cords-pv
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-source-manager
+  namespace: cords
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-source-manager
+  template:
+    metadata:
+      labels:
+        app: data-source-manager
+    spec:
+      nodeSelector:
+        node-role: edge-server
+      containers:
+      - name: data-source-manager
+        # image: 192.168.76.220:5000/cords-docker-images:data_source_manager
+        image: localhost:5000/cords-docker-images:data_source_manager
+        # resources:
+        #   limits:
+        #     memory: 512Mi
+        #     cpu: "1"
+        #   requests:
+        #     memory: 256Mi
+        #     cpu: "0.2"
+        ports:
+        - containerPort: 5002
+        env:
+        # - name: DATA_SOURCE_MANAGER_CONFIG
+        #   valueFrom:
+        #     configMapKeyRef:
+        #       name: cords-config
+        #       key: DATA_SOURCE_MANAGER_CONFIG
+        - name: MYSQL_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: cords-secret
+              key: MYSQL_USERNAME
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cords-secret
+              key: MYSQL_PASSWORD
+        - name: INFLUX_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: cords-secret
+              key: INFLUX_TOKEN
+      #   volumeMounts:
+      #   - mountPath: /app
+      #     name: cords-config
+      # volumes:
+      # - name: cords-config
+      #   persistentVolumeClaim:
+      #     claimName: cords-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-source-manager
+  namespace: cords
+spec:
+  selector:
+    app: data-source-manager
+  ports:
+  - protocol: TCP
+    port: 5002
+    targetPort: 5002

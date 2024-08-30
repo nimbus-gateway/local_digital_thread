@@ -1,59 +1,94 @@
 import json
 import os
+from tinydb import Query
+from db.db import TinyDBManager
+import uuid
 
 class MetaData:
-    def __init__(self, location):
 
+    def __init__(self):
+        """
+        Initialize the MetaData with a TinyDBManager instance.
+        
+        :param db_manager: An instance of TinyDBManager for database operations.
+        """
+        self.db_manager = TinyDBManager()
+
+        # Initialize data structures that will be loaded from the database
         self.mapping = []
         self.nodes = {}
         self.data_sources = {}
 
-        self.location = location
 
-        f = open(self.location)
-        
-        # returns JSON object as
-        # a dictionary
-        loaded_dic = json.load(f)
-
-        self.mapping  = loaded_dic
-
-    def register_datasource(self, key, source):
+    def register_datasource(self, source):
         try:
-            print(str(key))
-            self.data_sources[str(key)] = source
-            return self.data_sources[str(key)] 
+            # Check if a data source with the same name already exists
+            existing_source = self.db_manager.search('name', source.get('name'))
+            if existing_source:
+                return {
+                    "status": "error",
+                    "message": f"Data source with name '{source['name']}' already exists."
+                }
+            
+            # Generate a unique ID for the new data source
+            unique_id = uuid.uuid4()
+            source['type'] = 'datasource'
+            source['key'] = str(unique_id)
+
+            # Insert the new data source into the database
+            self.db_manager.insert(source)
+
+            return {
+                "status": "success",
+                "message": "Data source registered successfully.",
+                "key": source['key']
+            }
         except Exception as e:
             print("An error occurred:", str(e))
-            return False
-
+            return {
+                "status": "error",
+                "message": f"An error occurred: {str(e)}"
+            }
+    
     def get_datasource(self, key):
         print(key)
         key_str = str(key)
-        return self.data_sources[key_str]
+        result = self.db_manager.search('key', key_str)
+        if result:
+            return result[0]
+        return None
+    
 
-    def reload_mapping(self):
-        f = open(self.location)
-        
-        # returns JSON object as
-        # a dictionary
-        loaded_dic = json.load(f)
-
-        self.mapping  = loaded_dic
+    def get_datasources(self):
+        # Retrieve all data sources from the database
+        datasources = self.db_manager.search('type', 'datasource')
+        data_sources = datasources
+        return data_sources
 
 
     def add_mapping(self, new_map):
-
         self.mapping = new_map
 
         try:
-            with open(self.location, 'w') as json_file:
-                json.dump(self.mapping, json_file)
-          
-                return True
+            # Update or insert the mapping in the database
+            existing_mapping = self.db_manager.search('type', 'mapping')
+            if existing_mapping:
+                self.db_manager.update({'data': self.mapping}, 'type', 'mapping')
+            else:
+                self.db_manager.insert({'type': 'mapping', 'data': self.mapping})
+            return {
+                "status": "success",
+                "message": "Mapping added successfully.",
+            }
         except Exception as e:
             print("An error occurred:", str(e))
             return False
+        
+    def get_mapping(self):
+        result = self.db_manager.search('type', 'mapping')
+        if result:
+            return result[0]
+        return None
         
     def register_nodeid(self, reference_id, nodeid, mapping):
         mapping["nodeid"] = str(nodeid)
@@ -61,36 +96,37 @@ class MetaData:
         mapping["Measurementvalue"] = {}
         mapping["MeasurementTimeStamp"]["nodeid"] = str(nodeid+1)
         mapping["Measurementvalue"]["nodeid"] = str(nodeid+2)
+        mapping["type"] = 'node'
+        mapping["reference_id"] = reference_id
+
         print("loging from mapping ", mapping["nodeid"])
         print("mapping ", mapping)
-
-
-        self.nodes[reference_id] = mapping
-        print(self.nodes)
-        return True
-        # try:
-        #     with open(self.location, 'w') as json_file:
-        #         json.dump(self.mapping, json_file)
-          
-        #         return True
-        # except Exception as e:
-        #     print("An error occurred:", str(e))
-        #     return False
-
-
         
-    def get_buildings(self):
-        return self.mapping['Buildings']
+
+        self.db_manager.insert(mapping)
+        return True
     
-    def get_mapping(self):
-        return self.mapping
-    
-    # def get_datamap(self):
-    #     return self.mapping['Map']
-    
+
     def get_nodes(self):
-        print(self.nodes)
-        return self.nodes
+        result = self.db_manager.search('type', 'node')
+        if result:
+            return result
+        return None
+
+    def remove_nodes(self):
+        result = self.db_manager.delete('type', 'node')
+        print(result)
+        if result:
+            return result
+        return None
+
+
+    def get_buildings(self):
+        result = self.db_manager.search('type', 'mapping')
+        if result:
+            return result[0]['dataa']['Buildings']
+        return None
+
 
 
 

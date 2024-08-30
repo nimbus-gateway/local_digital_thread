@@ -1,6 +1,6 @@
 # Application Configuration
 
-database:
+mysql:
   host: 127.0.0.1
   port: 3306
   dbname: energymeters
@@ -8,20 +8,14 @@ database:
   password: admin
 
 influx:
-  username: admin
-  password: influxadmin
-
-opc:
-  serverurl: opc.tcp://0.0.0.0:4840/freeopcua/server/
-  namespaceuri: http://example.org
-  namespace: OPCUA_SERVER
-  servername: CORDS_LDT_Server
-  map: ./metadata/mapping.json
+  host: 127.0.0.1
+  port: 8086
+  org: mtu
+  token: JOC0TKLtbsC4_UJVl7ebtbtwmmaTG3HmN1SUASmz60PgVH9SA70ehzA4n01V9AlbC22W1UJ0tTDtd22Y-vFoPg==
 
 api:
   port: 5000
   host: 127.0.0.1
-
 logging:
   level: INFO
   file: app.log
