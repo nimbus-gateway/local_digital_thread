@@ -1,0 +1,9 @@
+{
+    "message_id": "fe28243396f079c6e3c34a18f1c046cb83900b63f4a837355ae7ab064d96f74a",
+    "source_component": "component_A",
+    "destination_component": "component_B",
+    "message_type": "request",
+    "payload": {
+      
+    }
+}

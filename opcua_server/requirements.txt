@@ -1,0 +1,8 @@
+PyYAML==5.3.1
+opcua==0.98.13
+asyncua==1.0.6
+requests==2.31.0
+cryptography==43.0.0
+mysql-connector-python==8.2.0
+influxdb-client==1.39.0
+dynaconf==3.2.5
