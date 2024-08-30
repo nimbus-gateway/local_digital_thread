@@ -20,9 +20,9 @@ metadata:
   namespace: cords
 type: Opaque
 data:
-  MYSQL_USERNAME: cm9vdA==
-  MYSQL_PASSWORD: YWRtaW4=
-  INFLUX_TOKEN: Sk9DMFRLTHRic0M0X1VKVmw3ZWJ0YnR3bW1hVEczSG1OMVNVQVNtejYwUGdWSDlTQTcwZWh6QTRuMDFWOUFsYkMyMlcxVUowdFREdGQyMlktdkZvUGc9PQ==
+  MYSQL_USERNAME: 
+  MYSQL_PASSWORD: 
+  INFLUX_TOKEN: 
 ---
 # apiVersion: v1
 # kind: PersistentVolume
