@@ -1,0 +1,20 @@
+version: '3.8'  # Specify the Docker Compose version
+
+services:
+  cords_opcua_client:
+    image: cords-opcua-client
+    container_name: cords_opcua_client
+    command: python opc_ua_client.py --opcua_reference_id="ProdEnergyMeter1" 
+    environment:
+      - PYTHONUNBUFFERED=1  # Optional: Keeps logs from being buffered
+    volumes:
+      - .:/app  # Mount the current directory to /app in the container
+    ports:
+      - "5000:5000"  # Optional: Expose ports if needed (adjust or remove as required)
+    # networks:
+    #   - my-network  # Optional: Define a network if your application needs it
+
+# Optional: Define networks if needed
+# networks:
+#   my-network:
+#     driver: bridge
