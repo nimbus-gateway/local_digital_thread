@@ -1,12 +1,22 @@
 version: '3'
 services:
   opcua_server:
-    image: opcua_server:latest
+    image: cords-opcua-server
     ports:
       - "4840:4840"
     volumes:
       - .:/app
     network_mode: host 
+    environment:
+      - OPC_SERVER_URL=opc.tcp://0.0.0.0:4840/freeopcua/server/
+      - OPC_NAMESPACE_URI=http://example.org
+      - OPC_NAMESPACE=OPCUA_SERVER
+      - OPC_SERVERNAME=CORDS_LDT_Server
+      - OPC_MAP=./metadata/mapping.json
+      - DATA_SOURCE_MANAGER_PORT=5000
+      - DATA_SOURCE_MANAGER_HOST=127.0.0.1
+      - LOGGING_LEVEL=INFO
+      - LOGGING_FILE=app.log
 
 
     

@@ -213,7 +213,11 @@ async def main():
     
     # calling the API and getting the mapping
     cwd = os.path.abspath('./')
+    
+    print("deleting existing node information from the data source manager..!!")
+    response = api.delete('removeNodes')
 
+        
     response = api.get('mapping')
 
     print("======response=====")
