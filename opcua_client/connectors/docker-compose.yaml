@@ -7,14 +7,21 @@ services:
     command: python opc_ua_client.py --opcua_reference_id="ProdEnergyMeter1" 
     environment:
       - PYTHONUNBUFFERED=1  # Optional: Keeps logs from being buffered
+      
+      # OPC UA Configuration
+      - OPC_SERVER_URL=opc.tcp://0.0.0.0:4840/freeopcua/server/  # Server URL for OPC UA
+      - OPC_NAMESPACE_URI=http://example.org  # Namespace URI for OPC UA
+      - OPC_NAMESPACE=OPCUA_SERVER  # Namespace index for OPC UA
+      - OPC_SERVERNAME=CORDS_LDT_Server # Server name for OPC UA
+
+      # Data Source Manager Configuration
+      - DATA_SOURCE_MANAGER_HOST=${DATA_SOURCE_MANAGER_HOST}  # Host for Data Source Manager
+      - DATA_SOURCE_MANAGER_PORT=${DATA_SOURCE_MANAGER_PORT}  # Port for Data Source Manager
+
     volumes:
       - .:/app  # Mount the current directory to /app in the container
     ports:
-      - "5000:5000"  # Optional: Expose ports if needed (adjust or remove as required)
-    # networks:
-    #   - my-network  # Optional: Define a network if your application needs it
+      - "6000:6000"  # Optional: Expose ports if needed (adjust or remove as required)
 
-# Optional: Define networks if needed
-# networks:
-#   my-network:
-#     driver: bridge
+    networks:
+      - cords_network

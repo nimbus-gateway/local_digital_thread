@@ -18,19 +18,18 @@ class Connector:
     def __init__(self,):
         self.connection = None
         # self.dbname = dbname
-
+    @abstractmethod
+    def connect(self, transformation={}, connection_profile={}):
+        pass
+    
     @abstractmethod
     def connect_(self, dbname, host, username, password):
         pass
 
     @abstractmethod
-    def get_data(self, mapping={}):
+    def get_data(self, transformation={}):
         pass
 
-    @abstractmethod
-    def get_data(self, fields=[]):
-        pass
-    
     @abstractmethod
     def post_data(self, fields=[]):
         pass
@@ -93,7 +92,6 @@ class InFlux(Connector):
 
         
     def get_data(self, transformation={}):
-
         _logger.info("Argument Recieved get_data", transformation)
 
         bucket = transformation['dbname']
@@ -118,7 +116,6 @@ class InFlux(Connector):
         # |> filter(fn: (r) => r["_field"] == "{1}")
         # |> filter(fn: (r) => r._measurement == "{2}")""".format(bucket, fieled_name, measurement)
 
-
         try:
             tables = query_api.query(query, org=self.org)
             result = []
@@ -132,7 +129,6 @@ class InFlux(Connector):
 
             return result
 
-            
         except Exception as e:
             print(e)
             return False
