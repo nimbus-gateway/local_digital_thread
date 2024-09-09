@@ -2,10 +2,11 @@
 
 
 opc:
-  server_url: opc.tcp://0.0.0.0:4840/freeopcua/server/
+  server_url: opc.tcp://192.168.76.220:4840/freeopcua/server/
   namespace_uri: http://example.org
   namespace: OPCUA_SERVER
   servername: CORDS_LDT_Server
+  reference_id: TestBedSmartMeter1
   map: ./metadata/mapping.json
 
 data_source_manager:

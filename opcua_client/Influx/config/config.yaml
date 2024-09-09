@@ -1,0 +1,18 @@
+# Application Configuration
+
+
+opc:
+  server_url: opc.tcp://192.168.76.220:4840/freeopcua/server/
+  namespace_uri: http://example.org
+  namespace: OPCUA_SERVER
+  servername: CORDS_LDT_Server
+  map: ./metadata/mapping.json
+
+data_source_manager:
+  port: 32412
+  host: 192.168.76.220
+
+logging:
+  level: INFO
+  file: app.log
+
