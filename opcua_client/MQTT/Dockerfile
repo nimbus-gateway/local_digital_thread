@@ -1,5 +1,6 @@
-# Use an official Python runtime as a parent image
-FROM --platform=linux/aarch64 python:3.9-alpine
+# Use an ARM-compatible Python base image
+FROM python:3.9-slim
+
 
 # Set the working directory in the container
 WORKDIR /app

@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  cords_opcua_client_mqqt:
+    image: 192.168.76.220:5000/cords-docker-images:cords_opcua_client_mqqt
+    restart: unless-stopped
+    environment:
+      OPC_SERVER_URL: "opc.tcp://192.168.76.220:4840/freeopcua/server/"
+      OPC_NAMESPACE_URI: "http://example.org"
+      OPC_NAMESPACE: "OPCUA_SERVER"
+      OPC_SERVERNAME: "CORDS_LDT_Server"
+      OPCUA_REFERENCE_ID: "TestBedSmartMeter1"
+
+      DATA_SOURCE_MANAGER_PORT: "32412"
+      DATA_SOURCE_MANAGER_HOST: "192.168.76.220"
+
+    networks:
+      - opcua-network
+
+  cords_opcua_client_influx:
+    image: 192.168.76.220:5000/cords-docker-images:cords_opcua_client_influx
+    restart: unless-stopped
+    environment:
+      OPC_SERVER_URL: "opc.tcp://192.168.76.220:4840/freeopcua/server/"
+      OPC_NAMESPACE_URI: "http://example.org"
+      OPC_NAMESPACE: "OPCUA_SERVER"
+      OPC_SERVERNAME: "CORDS_LDT_Server"
+      OPCUA_REFERENCE_ID: "TestBedSmartMeterBMS"
+
+      DATA_SOURCE_MANAGER_PORT: "32412"
+      DATA_SOURCE_MANAGER_HOST: "192.168.76.220"
+
+    networks:
+      - opcua-network
+
+networks:
+  opcua-network:
+    driver: bridge

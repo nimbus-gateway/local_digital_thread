@@ -151,7 +151,6 @@ def mqtt_setup(host, port, topic, username, password):
     mqtt_client.loop_start()  # Start MQTT listening in a separate thread
     return mqtt_client
 
-
 # Process MQTT messages and write to OPC UA
 async def process_mqtt_to_opc(client, measurementvalue_nid, measurementtimestamp_nid, mapping):
     while True:
@@ -253,7 +252,7 @@ async def main():
 
 
                 except Exception as e:
-                    _logger.error("MQQT related Error Occured: %r", e)
+                    _logger.error("Error Occured: %r", e)
                     _logger.error(traceback.format_exc())
                     return  # Exit the function if there's an exception
             else:

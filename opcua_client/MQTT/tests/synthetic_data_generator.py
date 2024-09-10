@@ -10,9 +10,11 @@ logger = logging.getLogger(__name__)
 
 random.seed(0)
 
+
+
 # Global vars
-DEVICE_NAME = 'OPIED01'
-MQTT_BROKER = '127.0.0.1'
+DEVICE_NAME = 'OPIED03'
+MQTT_BROKER = '192.168.76.25'
 TOPIC = "sensor/smartmeter/nimbus_testbed1"
 T = 30  # data period
 
@@ -38,16 +40,7 @@ def getTemperatureValues():
     data['dateTime'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return data
 
-# generate Humidity values
-# def getHumidityValues():
-#     data = {}
-#     data['deviceValue'] = gen_rnd_sensor_data(50, 90)
-#     data['deviceParameter'] = 'Humidity'
-#     data['deviceId'] = DEVICE_NAME
-#     data['dateTime'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-#     return data
 
-# Generate each parameter's data input every T seconds
 try:
     print(f'Connecting to MQTT broker running on {MQTT_BROKER}')
     client.loop_start()

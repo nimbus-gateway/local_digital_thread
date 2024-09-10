@@ -17,4 +17,4 @@ COPY . .
 # ENV VARIABLE_NAME=value
 
 # Run the Python script
-CMD ["python", "opc_ua_client_influx.py"]
+CMD ["python", "opc_ua_client.py"]

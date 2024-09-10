@@ -10,8 +10,8 @@ opc:
   map: ./metadata/mapping.json
 
 data_source_manager:
-  port: 5000
-  host: 127.0.0.1
+  port: 5002
+  host: 192.168.76.220
 
 logging:
   level: INFO
