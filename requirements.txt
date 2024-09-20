@@ -5,4 +5,5 @@ requests==2.31.0
 cryptography==2.8
 flask==3.0.0
 mysql-connector-python==8.2.0
-influxdb-client==1.39.0
+influxdb-client==1.39.
+tinydb

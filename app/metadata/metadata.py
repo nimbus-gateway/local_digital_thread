@@ -24,10 +24,21 @@ class MetaData:
         try:
             # Check if a data source with the same name already exists
             existing_source = self.db_manager.search('name', source.get('name'))
+            print(existing_source)
             if existing_source:
+                print("Data Source Exists")
+                 # Update the existing record without changing the ID
+                source['name'] = existing_source[0]['name']  # Preserve the existing ID
+                source['type'] = 'datasource'
+                existing_key = existing_source[0]['key']
+                print('Existing Key')
+                print(existing_key)
+                self.db_manager.update(source, 'key', existing_key)  # Update the record
+
                 return {
-                    "status": "error",
-                    "message": f"Data source with name '{source['name']}' already exists."
+                    "status": "success",
+                    "message": "Data source updated successfully.",
+                    "key": existing_key
                 }
             
             # Generate a unique ID for the new data source

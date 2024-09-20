@@ -40,6 +40,7 @@ To interact with the REST API, you can import the OPC UA.postman_collection.json
 The OPC UA server implements the CORDS' local digital thread's [CIM](https://github.com/nimbus-gateway/local_digital_thread/blob/main/docs/cim.PNG?raw=true) as an OPC UA representation. The local database schemas can then be mapped to OPC UA object instances defined through the Data Transformation API. 
 
 ```bash
+cd opcua_server
 python server.py
 ```
 

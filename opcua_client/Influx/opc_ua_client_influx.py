@@ -176,7 +176,7 @@ async def main():
                     measurement = transformation['table']
 
                     query = """from(bucket: "{0}")
-                            |> range(start: -2m)
+                            |> range(start: -10m)
                             |> filter(fn: (r) => r["_field"] == "{1}")
                             |> filter(fn: (r) => r._measurement == "{2}")""".format(bucket, fieled_name, measurement)
 
