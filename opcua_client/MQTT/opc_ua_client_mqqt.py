@@ -82,7 +82,7 @@ def unix_timestamp_to_ua_datetime(unix_timestamp):
     return ua.DateTime(opcua_intervals)
 
 
-async def push_data_to_opcua(client, measurementvalue_nid, measurementtimestamp_nid, value_data, time_data):
+async def push_data_to_opcua(client, measurementvalue_nid, measurementtimestamp_nid, value_data, timestamp_str):
     opc_value_variable = client.get_node(ua.NodeId(int(measurementvalue_nid), 2))
     opc_time_variable = client.get_node(ua.NodeId(int(measurementtimestamp_nid), 2))
     _logger.info("opc_value_nodeid is: %r", measurementvalue_nid)
@@ -90,23 +90,18 @@ async def push_data_to_opcua(client, measurementvalue_nid, measurementtimestamp_
     _logger.info("opc_value_variable is: %r", opc_value_variable)
     _logger.info("opc_time_variable is: %r", opc_time_variable)
 
+
+    source_timestamp = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
+
+    # Update the node with the new value and timestamp
+    data_value = ua.DataValue(Value=ua.Variant(value_data, ua.VariantType.Double), SourceTimestamp = source_timestamp)
+    #data_value.SourceTimestamp = source_timestamp
+
     _logger.info("pushing data to opcua server ")
-    await opc_value_variable.write_value(float(value_data))
+    await opc_value_variable.write_value(data_value)
 
-    # await opc_time_variable.write_value(time_data)
+    
 
-
-    # for val in data_array:
-    #     print("setting value: {0} time stamp: {1}".format(str(val[1]), str(val[0])))
-    #     data_value = ua.DataValue(ua.Variant(float(val[1]), ua.VariantType.Double), SourceTimestamp = datetime.utcfromtimestamp(val[0])) 
-
-    #     # await opc_value_variable.write_value(float(val[1]))
-    #     await opc_value_variable.write_value(data_value)
-
-    #     await opc_time_variable.write_value(datetime.utcfromtimestamp(val[0]))
-
-    #     val = await opc_value_variable.read_value()
-    #     date = await opc_time_variable.read_value()
 
 
 # Make sure that queue dont overflow
@@ -162,9 +157,7 @@ async def process_mqtt_to_opc(client, measurementvalue_nid, measurementtimestamp
             message_dict = json.loads(mqtt_data)
             value_data = message_dict[mapping['Measurementvalue']]
             time_val = message_dict[mapping['MeasurementTimeStamp']]
-            date_time_obj = datetime.strptime(time_val, "%Y-%m-%d %H:%M:%S")
-            unix_timestamp = int(date_time_obj.timestamp())
-            time_data = unix_timestamp
+
 
         except Exception as e:
             _logger.error("Cant transform MQTT Data: %r", e)
@@ -173,7 +166,8 @@ async def process_mqtt_to_opc(client, measurementvalue_nid, measurementtimestamp
 
         # Write MQTT message to OPC UA server
         # await opc_write(opc_client, mqtt_data)
-        await push_data_to_opcua(client, measurementvalue_nid, measurementtimestamp_nid, value_data, time_data)
+        print(time_val)
+        await push_data_to_opcua(client, measurementvalue_nid, measurementtimestamp_nid, value_data, time_val)
         # await asyncio.sleep(1)
 
 async def main():
