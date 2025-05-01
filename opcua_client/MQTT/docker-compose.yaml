@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   cords_opcua_client_mqqt:
-    image: 192.168.76.220:5000/cords-docker-images:cords_opcua_client_mqqt
+    image: 192.168.76.220:5000/cords_opcua_client_mqqt:latest
     restart: unless-stopped
     volumes:
       - ./config:/app/config  # Mount local config directory to container (optional)
