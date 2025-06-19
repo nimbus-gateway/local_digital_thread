@@ -40,3 +40,5 @@ __pycache__/
 .app
 .git
 .vagrant
+grafana/
+data_persistance/
