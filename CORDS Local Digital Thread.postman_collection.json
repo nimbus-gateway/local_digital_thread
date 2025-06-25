@@ -1,0 +1,423 @@
+{
+	"info": {
+		"_postman_id": "f1a7f02a-967c-4f84-ba0a-6dd6e59928e5",
+		"name": "CORDS Local Digital Thread",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "382202"
+	},
+	"item": [
+		{
+			"name": "Register Data Source MySQL",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"connector_mysql_local01\",\r\n    \"name\": \"MySQLConnector\",\r\n    \"type\": \"database\",\r\n    \"connector\": \"MySQL\",\r\n    \"connection_profile\": {\r\n        \"host\": \"127.0.0.1\",\r\n        \"port\": \"3306\",\r\n        \"username\": \"root\",\r\n        \"password\": \"admin\",\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/datasource",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"datasource"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register Data Source Influx",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"InFluxConnector\",\r\n    \"connector\": \"InFlux\",\r\n    \"connection_profile\": {\r\n        \"host\": \"127.0.0.1\",\r\n        \"port\": \"8086\",\r\n        \"token\": \"JOC0TKLtbsC4_UJVl7ebtbtwmmaTG3HmN1SUASmz60PgVH9SA70ehzA4n01V9AlbC22W1UJ0tTDtd22Y-vFoPg==\",\r\n        \"org\": \"mtu\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/datasource",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"datasource"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register Data Source MQT",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"MQTTConnector\",\r\n    \"connector\": \"MQTT\",\r\n    \"connection_profile\": {\r\n        \"host\": \"127.0.0.1\",\r\n        \"port\": \"1883\",\r\n        \"username\": \"\",\r\n        \"password\": \"\"\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/datasource",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"datasource"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Data Source",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"entry\": {\r\n    \"cid\": \"ruonjtaab593weew\",\r\n    \"variation_id\": 3061534,\r\n    \"variation_version_id\": 280976,\r\n    \"source_url\": \"https://www.askranil.com/\",\r\n    \"page_id\": \"16oaw202\",\r\n    \"page_name\": \"Main Page Desktop\",\r\n    \"fields\": {\r\n      \"wfcFirstname_2850901\": \"sdfd\",\r\n      \"wfcPhone_6803252\": \"dsf dsf\",\r\n      \"wfcText_9428038\": \"sdf sd\",\r\n      \"wfcTextarea_723265\": \"dsf sdf\"\r\n    },\r\n    \"conversion\": \"form\",\r\n    \"count_as_conversion\": true\r\n  }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/datasource",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"datasource"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Data Sources",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/datasources",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"datasources"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Mapping",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Buildings\": [\r\n        {\r\n            \"BuildingArea\": \"5000 sqm\",\r\n            \"BuildingID\": \"Bldg-12345\",\r\n            \"BuildingLocation\": {\r\n                \"Latitude\": \"40.7128\",\r\n                \"Longitude\": \"-74.0060\"\r\n            },\r\n            \"BuildingName\": \"West Wing Building\",\r\n            \"Machines\": [\r\n                {\r\n                    \"DeviceID\": \"AuxiliaryService1\",\r\n                    \"DeviceManufacturer\": \"\",\r\n                    \"DeviceModel\": \"\",\r\n                    \"EnergyMeters\": [\r\n                        {\r\n                            \"DeviceID\": \"AuxEnergyMeter1\",\r\n                            \"DeviceManufacturer\": \"Honeywell International Inc\",\r\n                            \"DeviceModel\": \"TEW Emlite - Single Phase Digital\",\r\n                            \"MeteringService\": {\r\n                                \"CurrentMeasurement\": {\r\n                                    \"MeasurementTimeInterval\": \"1s\",\r\n                                    \"MeasurementUnit\": \"KW/h\",\r\n                                    \"Transformation\":{\r\n                                            \"mapping_type\": \"database\",\r\n                                            \"connector\": \"0d99a7cf-b5cc-4a55-8d9d-481a9c9accba\",\r\n                                            \"dbname\": \"energymeters\",\r\n                                            \"table\": \"block_13\",\r\n                                            \"mapping\":{\r\n                                                \"MeasurementTimeStamp\": \"tstp\",\r\n                                                \"Measurementvalue\": \"energy\",\r\n                                                \"TimeFormat\": \"%Y-%m-%d %H:%M:%S.%f\"\r\n\r\n                                            },\r\n                                            \"query\":{\r\n\r\n                                            }\r\n                                            \r\n                                    }\r\n                                },\r\n                                \"ServiceName\": \"\"\r\n                            }\r\n                        }\r\n                    ]\r\n                }\r\n\r\n            ],\r\n            \"Weather\": {\r\n                \"AtmosphoricPressure\": 1013.3,\r\n                \"Cloudage\": 75.2,\r\n                \"DayTime\": \"11/22/2023 11:24:46.412 AM\",\r\n                \"Precipitation\": 0.2,\r\n                \"Visibility\": 10,\r\n                \"WeatherCondition\": \"Partly Cloudy\"\r\n            }\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/mapping",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"mapping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Mapping",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/mapping",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"mapping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Mapping",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Buildings\": [\r\n        {\r\n            \"BuildingArea\": \"5000 sqm\",\r\n            \"BuildingID\": \"Bldg-12345\",\r\n            \"BuildingLocation\": {\r\n                \"Latitude\": \"40.7128\",\r\n                \"Longitude\": \"-74.0060\"\r\n            },\r\n            \"BuildingName\": \"West Wing Building\",\r\n            \"Machines\": [\r\n               {\r\n                    \"DeviceID\": \"AuxiliaryService1\",\r\n                    \"DeviceManufacturer\": \"\",\r\n                    \"DeviceModel\": \"\",\r\n                    \"EnergyMeters\": [\r\n                        {\r\n                            \"DeviceID\": \"AuxEnergyMeter1\",\r\n                            \"DeviceManufacturer\": \"Honeywell International Inc\",\r\n                            \"DeviceModel\": \"TEW Emlite - Single Phase Digital\",\r\n                            \"MeteringService\": {\r\n                                \"CurrentMeasurement\": {\r\n                                    \"MeasurementTimeInterval\": \"1s\",\r\n                                    \"MeasurementUnit\": \"KW/h\",\r\n                                    \"Transformation\":{\r\n                                            \"mapping_type\": \"database\",\r\n                                            \"connector\": \"0d99a7cf-b5cc-4a55-8d9d-481a9c9accba\",\r\n                                            \"dbname\": \"energymeters\",\r\n                                            \"table\": \"MeterData\",\r\n                                            \"mapping\":{\r\n                                                \"MeasurementTimeStamp\": \"time\",\r\n                                                \"Measurementvalue\": \"power\"\r\n\r\n                                            },\r\n                                            \"query\":{\r\n\r\n                                            }\r\n                                            \r\n                                    }\r\n                                },\r\n                                \"ServiceName\": \"\"\r\n                            }\r\n                        }\r\n                    ]\r\n                },\r\n                {\r\n                    \"DeviceID\": \"ProductionMachine1\",\r\n                    \"DeviceManufacturer\": \"\",\r\n                    \"DeviceModel\": \"\",\r\n                    \"EnergyMeters\": [\r\n                        {\r\n                            \"DeviceID\": \"ProdEnergyMeter1\",\r\n                            \"DeviceManufacturer\": \"Apator SA\",\r\n                            \"DeviceModel\": \"Meter 1(63) A 100-265V\",\r\n                            \"MeteringService\": {\r\n                                \"CurrentMeasurement\": {\r\n                                    \"MeasurementTimeInterval\": \"1s\",\r\n                                    \"MeasurementUnit\": \"KW/h\",\r\n                                    \"Transformation\":{\r\n                                            \"mapping_type\": \"database\",\r\n                                            \"connector\": \"6909ea44-ddfe-4e42-ac67-f07dcea58734\",\r\n                                            \"dbname\": \"energy_meters\",\r\n                                            \"table\": \"Meter_E\",\r\n                                            \"mapping\":{\r\n                                                \"MeasurementTimeStamp\": \"time\",\r\n                                                \"Measurementvalue\": \"power_consumption\"\r\n                                            },\r\n                                            \"query\":{\r\n                                                \r\n                                            }\r\n                                            \r\n                                    }\r\n                                    \r\n                                },\r\n                                \"ServiceName\": \"\"\r\n                            }\r\n                        }\r\n                    ]\r\n                }\r\n            ],\r\n            \"Weather\": {\r\n                \"AtmosphoricPressure\": 1013.3,\r\n                \"Cloudage\": 75.2,\r\n                \"DayTime\": \"11/22/2023 11:24:46.412 AM\",\r\n                \"Precipitation\": 0.2,\r\n                \"Visibility\": 10,\r\n                \"WeatherCondition\": \"Partly Cloudy\"\r\n            }\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/mapping",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"mapping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Schema MySQL",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/schema/0d99a7cf-b5cc-4a55-8d9d-481a9c9accba/energymeters/MeterData",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"schema",
+						"0d99a7cf-b5cc-4a55-8d9d-481a9c9accba",
+						"energymeters",
+						"MeterData"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Schema InfluxDB",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/schema/connector_influx_local01/local_digital_thread/test_B",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"schema",
+						"connector_influx_local01",
+						"local_digital_thread",
+						"test_B"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Node",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/addNode",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"addNode"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "OPCUA Restart",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/opcuaRestart",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"opcuaRestart"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Nodes",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/removeNodes",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"removeNodes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Nodes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/nodes",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"nodes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Node By ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/nodes",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"nodes"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
